@@ -1,0 +1,14 @@
+displayName = Masochist Mode EX
+author = Terry, Fargowilta, Pudim, Ricyez, Vaema, First Fractal
+version = 1.11
+homepage = https://discord.gg/wBESmn5qPe
+
+hideCode = false
+hideResources = false
+includeSource = true
+includePDB = true
+
+modReferences = FargowiltasSouls, Fargowiltas
+sortAfter = FargowiltasSouls, Fargowiltas
+
+buildIgnore = .vs\*, Properties\*, lib\*, *.csproj, *.user, obj\*, bin\*, *.config, *.md, .git\*, .github\*, LICENSE, README.md, .editorconfig, .gitignore, .gitattributes

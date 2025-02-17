@@ -1,0 +1,20 @@
+Items: {
+	MutantSummon: {
+		DisplayName: Fuck You
+		Tooltip: Summons Mutant
+	}
+}
+
+NPCs: {
+	PhantomPortal.DisplayName: Phantom Portal
+	PurityPortal.DisplayName: Purity Portal
+	CultistIllusion.DisplayName: Cultist Illusion
+}
+
+Projectiles: {
+	Arena.DisplayName: Arena
+	EyePhantom.DisplayName: Eye Phantom
+	MoonLordText.DisplayName: Kill Yourself
+	MutantText.DisplayName: Kill Yourself 2.0
+	PhantasmalDeathrayIce.DisplayName: Icy Deathray
+}
