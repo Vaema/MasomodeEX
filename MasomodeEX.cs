@@ -86,7 +86,7 @@ namespace MasomodeEX
                 Souls.Find<ModBuff>("DefenselessBuff").Type,
                 Souls.Find<ModBuff>("FlamesoftheUniverseBuff").Type,
                 Souls.Find<ModBuff>("FlippedBuff").Type,
-                Souls.Find<ModBuff>("FlippedHallowBuff").Type,
+                Souls.Find<ModBuff>("HallowIlluminatedBuff").Type,
                 Souls.Find<ModBuff>("FusedBuff").Type,
                 Souls.Find<ModBuff>("GodEaterBuff").Type,
                 Souls.Find<ModBuff>("GuiltyBuff").Type,

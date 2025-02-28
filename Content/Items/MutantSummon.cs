@@ -5,7 +5,7 @@ namespace MasomodeEX.Content.Items
 {
     public class MutantSummon : ModItem
     {
-        public override string Texture => "MasomodeEX/Items/Placeholder";
+        public override string Texture => "FargowiltasSouls/Content/Items/Placeholder";
 
         public override void SetDefaults()
         {

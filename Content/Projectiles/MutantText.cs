@@ -55,7 +55,7 @@ public class MutantText : ModProjectile
             Projectile.localAI[0] = 1f;
             if (ModLoader.GetMod("FargowiltasSouls") != null && npc.type == ModLoader.GetMod("FargowiltasSouls").Find<ModNPC>("MutantBoss").Type)
             {
-                SoundStyle sound = new("Sounds/MutantHit", (SoundType)0);
+                SoundStyle sound = new("Sounds/MutantHit", SoundType.Sound);
                 sound.WithPitchOffset(0.25f);
                 npc.HitSound = sound.WithVolumeScale(1.5f);
             }
