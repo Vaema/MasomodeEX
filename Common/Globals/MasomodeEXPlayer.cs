@@ -152,7 +152,7 @@ namespace MasomodeEX.Common.Globals
             
             if (Player.ZoneHallow)
             {
-                Player.AddBuff(MasomodeEX.Souls.Find<ModBuff>("HallowIlluminatedBuff").Type, 120, true, false);
+                Player.AddBuff(MasomodeEX.Souls.Find<ModBuff>("HallowIlluminatedBuff").Type, 120);
                 if (Player.wet)
                     Player.AddBuff(31, 2, true, false);
             }
