@@ -1,0 +1,15 @@
+﻿[h1]Masochist Mode EX[/h1]
+
+[h2]Information[/h2]
+This is a Fargo's Souls Mod add-on that turns the game into a truly hellish experience. It currently has no rewards. You subject yourself to pain entirely for its sake.
+No toggle item is needed to activate Masochist Mode EX in a world - just install, reload, and play.
+
+[hr]
+
+[h2]Dependencies[/h2]
+This mod requires the other following mods to be enabled:
+[list]
+[*] Fargo's Mutant Mod
+[*] Fargo's Souls Mod
+[*] Luminance
+[/list]
