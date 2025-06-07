@@ -8,6 +8,7 @@ using MasomodeEX.Common.Utilities;
 using Luminance.Common.Utilities;
 using System.Linq;
 using Microsoft.Xna.Framework.Graphics;
+using FargowiltasSouls;
 
 namespace MasomodeEX.Common.Globals
 {
@@ -142,6 +143,17 @@ namespace MasomodeEX.Common.Globals
                         if (projectile.Distance(mouthPos) < 10) // dissappear in lord's mouth
                             projectile.active = false;
                     }
+
+                    if (projectile.Distance(Main.LocalPlayer.Center) < 20) // actually hurt player
+                    {
+                        if (++projectile.localAI[1] > 10)
+                        {
+                            projectile.localAI[1] = 0;
+                            Main.LocalPlayer.Hurt(PlayerDeathReason.ByProjectile(Main.LocalPlayer.whoAmI, projectile.whoAmI), FargoSoulsUtil.ScaledProjectileDamage(139, 2f), projectile.direction);
+                        }
+                    }
+                    else
+                        projectile.localAI[1] = 0;
                 }
 
                 if (++projectile.frameCounter > 5)
