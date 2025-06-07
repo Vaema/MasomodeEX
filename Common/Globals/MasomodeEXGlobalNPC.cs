@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using FargowiltasSouls.Content.Bosses.MutantBoss;
+using FargowiltasSouls.Content.Projectiles.Masomode;
 using FargowiltasSouls.Core.Globals;
 using FargowiltasSouls.Core.ModPlayers;
 using FargowiltasSouls.Core.Systems;
@@ -678,7 +679,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             dist *= 10f;
 
                             for (int num = 0; num < 12; num++)
-                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 6.0 * num, default), MasomodeEX.Souls.Find<ModProjectile>("DarkStar").Type, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 6.0 * num, default), ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
                         }
                     }
 
@@ -709,7 +710,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             dist.Normalize();
                             dist *= 14f;
                             for (int j = 0; j < 8; j++)
-                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 4.0 * j, default), MasomodeEX.Souls.Find<ModProjectile>("DarkStar").Type, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 4.0 * j, default), ModContent.ProjectileType<MechElectricOrbSpaz>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
                         }
                     }
 
@@ -793,7 +794,10 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         for (int num = 0; num < 6; num++)
-                            Projectile.NewProjectile(null, npc.Center, Vector2.Normalize(npc.position - npc.oldPosition).RotatedBy(Math.PI / 4.0 * num, default) * 10f, MasomodeEX.Souls.Find<ModProjectile>("DarkStar").Type, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                        {
+                            int p = Projectile.NewProjectile(null, npc.Center, Vector2.Normalize(npc.position - Main.player[npc.target].position).RotatedBy(Math.PI / 4.0 * num, default) * 10f, ModContent.ProjectileType<MechElectricOrbHoming>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Main.projectile[p].ai[2] = 1; // destroyer themed color
+                        }
                     }
 
                     break;
@@ -876,7 +880,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     {
                         Counter[0] = 0;
                         if (Main.netMode != NetmodeID.MultiplayerClient && npc.HasPlayerTarget)
-                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 14f, MasomodeEX.Souls.Find<ModProjectile>("DarkStar").Type, npc.damage / 4, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 14f, ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 4, 0f, Main.myPlayer, 0f, 0f, 0f);
                     }
 
                     break;
