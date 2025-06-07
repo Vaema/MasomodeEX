@@ -5,6 +5,9 @@ using Terraria.DataStructures;
 using Terraria.ModLoader;
 using Terraria.ID;
 using MasomodeEX.Common.Utilities;
+using Luminance.Common.Utilities;
+using System.Linq;
+using Microsoft.Xna.Framework.Graphics;
 
 namespace MasomodeEX.Common.Globals
 {
