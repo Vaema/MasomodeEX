@@ -53,15 +53,6 @@ namespace MasomodeEX.Common.Globals
                     projectile.position += projectile.velocity / 2f;
                     break;
 
-                case 456:
-                    if (projectile.Center == Main.player[(int)projectile.ai[1]].Center && Main.player[(int)projectile.ai[1]].active && !Main.player[(int)projectile.ai[1]].dead)
-                    {
-                        Player obj3 = Main.player[(int)projectile.ai[1]];
-                        obj3.position += Main.player[(int)projectile.ai[1]].DirectionTo(Main.npc[(int)projectile.ai[0]].Center) * 5f;
-                    }
-                    projectile.position += projectile.velocity * 0.5f;
-                    break;
-
                 case 384:
                 case 386:
                     if (Main.player[Main.myPlayer].active && !Main.player[Main.myPlayer].dead && projectile.Distance(Main.player[Main.myPlayer].Center) < 1000f)
@@ -120,6 +111,44 @@ namespace MasomodeEX.Common.Globals
                     }
                     break;
             }
+        }
+
+        public override bool PreAI(Projectile projectile)
+        {
+            if (projectile.type == ProjectileID.MoonLeech) // rewritting bc vanilla one doesn't fit
+            {
+                foreach(var n in Main.npc.Where(npc => npc.type == NPCID.MoonLordHead))
+                {
+                    if (!n.active)
+                        projectile.active = false;
+
+                    Vector2 mouthPos = n.Center + Vector2.UnitY * 220;
+
+                    projectile.rotation = (projectile.Center - mouthPos).ToRotation() - MathHelper.PiOver2;
+                    projectile.localAI[0]++;
+
+                    float speed = 11.2f;
+                    float dis = projectile.Distance(Main.player[(int)projectile.ai[1]].Center);
+                    if (projectile.localAI[0] < 400) // try to get target's ass
+                    {
+                        projectile.velocity = projectile.SafeDirectionTo(Main.player[(int)projectile.ai[1]].Center) * speed;
+                    }
+                    else // return to lord
+                    {
+                        projectile.velocity = projectile.SafeDirectionTo(mouthPos) * (dis * 0.05f);
+                        if (projectile.Distance(mouthPos) < 10) // dissappear in lord's mouth
+                            projectile.active = false;
+                    }
+                }
+
+                if (++projectile.frameCounter > 5)
+                {
+                    projectile.frameCounter = 0;
+                    projectile.frame = ++projectile.frame % Main.projFrames[projectile.type];
+                }
+                return false;
+            }
+            return base.PreAI(projectile);
         }
 
         public override void OnKill(Projectile projectile, int timeLeft)
@@ -198,6 +227,50 @@ namespace MasomodeEX.Common.Globals
                     target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " got terminated."), 19998.0, 0, false);
                     break;
             }
+        }
+
+        public override bool PreDraw(Projectile projectile, ref Color lightColor)
+        {
+            if (projectile.type == ProjectileID.MoonLeech)
+            {
+                Texture2D Texture = ModContent.Request<Texture2D>($"Terraria/Images/Projectile_{ProjectileID.MoonLeech}").Value; // end
+                Texture2D Texture2 = ModContent.Request<Texture2D>("Terraria/Images/Extra_23").Value; // mid
+                Texture2D Texture3 = ModContent.Request<Texture2D>("Terraria/Images/Extra_24").Value; // start
+                Rectangle source = Texture.Frame(1, Main.projFrames[projectile.type], frameY: projectile.frame);
+
+                // draw projectile
+                Main.EntitySpriteDraw(Texture, projectile.Center - Main.screenPosition, source, lightColor, projectile.rotation, source.Size() * 0.5f, projectile.scale, SpriteEffects.None, 0);
+
+                // draw tongue
+                foreach (var n in Main.npc.Where(npc => npc.type == NPCID.MoonLordHead))
+                {
+                    Vector2 drawPos = projectile.Center;
+                    Vector2 mouthPos = n.Center + Vector2.UnitY * 220;
+                    Vector2 vectorFromProjectileToMouth = mouthPos.MoveTowards(drawPos, 4f) - drawPos;
+                    Vector2 unitVectorFromProjectileToMouth = vectorFromProjectileToMouth.SafeNormalize(Vector2.Zero);
+
+                    float chainHeightAdjustment = 0f;
+                    float segmentLength = Texture2.Height + chainHeightAdjustment;
+                    if (segmentLength == 0)
+                        segmentLength = 10 * projectile.scale;
+
+                    float chainRotation = unitVectorFromProjectileToMouth.ToRotation() + MathHelper.PiOver2;
+                    float chainsRemainingToDraw = vectorFromProjectileToMouth.Length() + segmentLength / 2f;
+
+                    while (chainsRemainingToDraw > 0f) // draw chain
+                    {
+                        Main.spriteBatch.Draw(Texture2, drawPos - Main.screenPosition, null, lightColor, chainRotation, source.Size() * 0.5f + Vector2.UnitY * 28, projectile.scale, SpriteEffects.None, 0);
+                        drawPos += unitVectorFromProjectileToMouth * segmentLength;
+                        chainsRemainingToDraw -= segmentLength;
+                    }
+
+                    Main.spriteBatch.Draw(Texture3, drawPos - Main.screenPosition, null, lightColor, chainRotation, source.Size() * 0.5f - Vector2.UnitY * 28, projectile.scale, SpriteEffects.None, 0); // draw start of the tongue
+                }
+
+                return false;
+            }
+
+            return base.PreDraw(projectile, ref lightColor);
         }
     }
 }
