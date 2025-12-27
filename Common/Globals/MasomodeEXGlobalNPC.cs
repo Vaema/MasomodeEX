@@ -1179,7 +1179,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         {
                             Counter[0] = 0;
                             if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(null, npc.Center, Main.rand.NextVector2Unit(0f, (float)Math.PI * 2f) * 12f, Mod.Find<ModProjectile>("MothDust").Type, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, Main.rand.NextVector2Unit(0f, (float)Math.PI * 2f) * 12f, ModContent.ProjectileType<MothDust>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
                         }
                         break;
                     }
@@ -1442,11 +1442,11 @@ public class MasomodeEXGlobalNPC : GlobalNPC
             case 131:
             case 135:
             case 136:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 2);
+                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300);
                 break;
             case 139:
                 {
-                    target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 2);
+                    target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300);
                     NPC.SpawnOnPlayer(target.whoAmI, 127);
                     NPC.SpawnOnPlayer(target.whoAmI, 125);
                     NPC.SpawnOnPlayer(target.whoAmI, 126);
@@ -1454,7 +1454,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     break;
                 }
             case 134:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 2, true, false);
+                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300, true, false);
                 if (target.statLife + hurtInfo.Damage < 300)
                     target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " was eaten alive by The Destroyer."), 999.0, 0, false);
                 break;

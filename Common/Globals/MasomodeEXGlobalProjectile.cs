@@ -187,7 +187,7 @@ namespace MasomodeEX.Common.Globals
             }
         }
 
-        public virtual void OnHitPlayer(Projectile projectile, Player target, int damage, bool crit)
+        public override void OnHitPlayer(Projectile projectile, Player target, Player.HurtInfo info)
         {
             switch (projectile.type)
             {
@@ -200,7 +200,7 @@ namespace MasomodeEX.Common.Globals
                     {
                         if (Main.npc[i].active && (Main.npc[i].type == NPCID.SkeletronPrime || Main.npc[i].type == NPCID.TheDestroyer || Main.npc[i].type == NPCID.Retinazer || Main.npc[i].type == NPCID.Spazmatism))
                         {
-                            target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWings").Type, 2, true, false);
+                            target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 180, true, false);
                             break;
                         }
                     }
