@@ -1,0 +1,12 @@
+Masochist: Masochist EX Mode
+MasochistEnabled: Masochist EX is enabled
+MasochistOption:
+	'''
+	[c/33ffbe:An impossibly difficult challenge mode. It is highly recommended to play base Fargo Souls mod first!]
+	Requires Legendary Master Mode difficulty for mod's work
+	'''
+ExpandedMasochist:
+	'''
+	[c/33ffbe:An impossibly difficult challenge mode. It is highly recommended to play base Fargo Souls mod first!]
+	World must be in Legendary Master Mode
+	'''

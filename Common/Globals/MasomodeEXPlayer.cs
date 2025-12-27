@@ -7,6 +7,7 @@ using static Terraria.Player;
 using Terraria.ID;
 using MasomodeEX.Common.Utilities;
 using FargowiltasSouls.Core.ModPlayers;
+using FargowiltasSouls;
 
 namespace MasomodeEX.Common.Globals
 {
@@ -206,7 +207,6 @@ namespace MasomodeEX.Common.Globals
             if (MasoModeUtils.checkIfMasoEX() && NPC.AnyNPCs(398) && --hitcap <= 0)
             {
                 Player.KillMe(PlayerDeathReason.ByCustomReason(Player.name + " got terminated."), 19998.0, 0, false);
-                Main.NewText(Language.GetTextValue("Mods.MasomodeEX.Messages.FailedMLHits"), (Color?)Color.LimeGreen);
             }
         }
 
@@ -239,9 +239,7 @@ namespace MasomodeEX.Common.Globals
         {
             if (MasoModeUtils.checkIfMasoEX())
             {
-                Main.NewText(Language.GetTextValue("Mods.MasomodeEX.Messages.JoinWorld"), (Color?)Color.Red);
-                Main.NewText(Language.GetTextValue("Mods.MasomodeEX.Messages.JoinWorld1"), (Color?)Color.Red);
-                Main.NewText(Language.GetTextValue("Mods.MasomodeEX.Messages.JoinWorld2"), (Color?)Color.Red);
+                Main.NewText(Language.GetTextValue("Mods.MasomodeEX.Messages.JoinWorld"), Color.Lime);
             }
         }
     }

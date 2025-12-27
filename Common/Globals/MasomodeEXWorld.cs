@@ -81,7 +81,6 @@ namespace MasomodeEX.Common.Globals
                 if (Main.rand.NextBool(4))
                 {
                     ForcedSE = true;
-                    MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.ForcedSE"), Color.Orange);
                 }
                 else
                     ForcedSE = false;
@@ -95,7 +94,6 @@ namespace MasomodeEX.Common.Globals
                     if (Main.rand.NextBool(4))
                     {
                         ForcedBM = true;
-                        MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.ForcedBM"), Color.DarkRed);
                     }
                     else
                         ForcedBM = false;

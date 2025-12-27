@@ -18,3 +18,11 @@ Projectiles: {
 	MutantText.DisplayName: Kill Yourself 2.0
 	PhantasmalDeathrayIce.DisplayName: Icy Deathray
 }
+
+Messages.JoinWorld:
+	'''
+	Welcome to Masochist EX!
+	This is NOT regular Eternity/Masochist mode
+	This is unbalanced, impossibly difficult Masochist EX mode!!
+	Disable Masochist Mode EX mod for the correct Fargo's Souls Mod experience!!!
+	'''

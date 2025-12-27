@@ -27,7 +27,7 @@ namespace MasomodeEX.Common.Globals
                         if (MasomodeEX.Instance.VeinMinerLoaded)
                         {
                             int player2 = Player.FindClosest(new Vector2(i * 16, j * 16), 0, 0);
-                            MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.MeteoriteVeinMiner"), Color.LimeGreen);
+
                             if (player2 != -1)
                                 NPC.SpawnOnPlayer(player2, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
                         }
@@ -39,24 +39,12 @@ namespace MasomodeEX.Common.Globals
                     case 226:
                         if (!NPC.downedMoonlord)
                         {
-                            MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.MLDungeon"), Color.Cyan);
                             return false;
                         }
                         break;
 
                     case 58:
-                        if (!NPC.downedBoss2)
-                        {
-                            if (WorldGen.crimson)
-                                MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.BrainHellstone"), Color.Crimson);
-                            else
-                                MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.WormHellstone"), Color.Purple);
-                        }
-
-                        if (!NPC.downedBoss3)
-                            MasoModeUtils.Talk(Language.GetTextValue("Mods.MasomodeEX.Messages.SkullHellstone"), Color.PeachPuff);
-                        
-                        if (!NPC.downedBoss2 && !NPC.downedBoss3)
+                        if (!NPC.downedBoss2 || !NPC.downedBoss3)
                             return false;
                         break;
 

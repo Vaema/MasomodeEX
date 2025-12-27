@@ -1,6 +1,6 @@
 displayName = Masochist Mode EX
 author = Terry, Fargowilta, Pudim, Ricyez, Vaema, First Fractal
-version = 1.12.1
+version = 1.12.2
 homepage = https://discord.gg/wBESmn5qPe
 
 hideCode = false
