@@ -1,11 +1,27 @@
 using System;
 using System.Collections.Generic;
+using FargowiltasSouls;
+using FargowiltasSouls.Content.Bosses.Champions.Cosmos;
+using FargowiltasSouls.Content.Bosses.Champions.Earth;
+using FargowiltasSouls.Content.Bosses.Champions.Life;
+using FargowiltasSouls.Content.Bosses.Champions.Nature;
+using FargowiltasSouls.Content.Bosses.Champions.Shadow;
+using FargowiltasSouls.Content.Bosses.Champions.Spirit;
+using FargowiltasSouls.Content.Bosses.Champions.Terra;
+using FargowiltasSouls.Content.Bosses.Champions.Timber;
+using FargowiltasSouls.Content.Bosses.Champions.Will;
 using FargowiltasSouls.Content.Bosses.MutantBoss;
+using FargowiltasSouls.Content.Buffs.Masomode;
+using FargowiltasSouls.Content.NPCs.EternityModeNPCs;
 using FargowiltasSouls.Content.Projectiles.Masomode;
 using FargowiltasSouls.Core.Globals;
 using FargowiltasSouls.Core.ModPlayers;
 using FargowiltasSouls.Core.Systems;
 using MasomodeEX.Common.Utilities;
+using MasomodeEX.Content.Buffs;
+using MasomodeEX.Content.NPCs;
+using MasomodeEX.Content.NPCs.Cultist;
+using MasomodeEX.Content.Projectiles;
 using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.Audio;
@@ -14,8 +30,6 @@ using Terraria.DataStructures;
 using Terraria.ID;
 using Terraria.Localization;
 using Terraria.ModLoader;
-using static Terraria.NPC;
-using static Terraria.Player;
 
 namespace MasomodeEX.Common.Globals;
 
@@ -42,14 +56,9 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                 npc.defense = (int)(npc.defense * 1.5);
                 npc.knockBackResist *= 0.5f;
             }
-            npc.buffImmune[24] = true;
-            npc.buffImmune[68] = true;
+            npc.buffImmune[BuffID.OnFire] = true;
+            npc.buffImmune[BuffID.Suffocation] = true;
             npc.GetGlobalNPC<EModeGlobalNPC>().isWaterEnemy = true;
-            if (npc.type == ModContent.NPCType<MutantBoss>())
-            {
-                npc.ModNPC.Music = MusicLoader.GetMusicSlot(Mod, "Sounds/Music/MutantPhase1");
-                npc.ModNPC.SceneEffectPriority = (SceneEffectPriority)8;
-            }
         }
     }
 
@@ -66,33 +75,34 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                 {
                     switch (npc.type)
                     {
-                        case 20:
-                            npc.Transform(196);
+                        case NPCID.Dryad:
+                            npc.Transform(NPCID.Nymph);
                             break;
-                        case 229:
-                            npc.Transform(216);
+                        case NPCID.Pirate:
+                            npc.Transform(NPCID.PirateCaptain);
                             break;
-                        case 441:
-                            npc.Transform(534);
+                        case NPCID.TaxCollector:
+                            npc.Transform(NPCID.DemonTaxCollector);
                             break;
-                        case 228:
-                            npc.Transform(198);
+                        case NPCID.WitchDoctor:
+                            npc.Transform(NPCID.Lihzahrd);
                             break;
-                        case 54:
-                            npc.Transform(35);
+                        case NPCID.Clothier:
+                            npc.Transform(NPCID.SkeletronHead);
                             break;
+
                         default:
-                            if (npc.type == MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type)
-                                npc.Transform(MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+                            if (npc.type == ModContent.NPCType<MutantBoss>())
+                                npc.Transform(ModContent.NPCType<MutantBoss>());
                             else if (npc.type != MasomodeEX.Fargo.Find<ModNPC>("Abominationn").Type && npc.type != MasomodeEX.Fargo.Find<ModNPC>("Deviantt").Type)
-                                npc.Transform(104);
+                                npc.Transform(NPCID.Werewolf);
                             break;
                     }
                 }
             }
             switch (npc.type)
             {
-                case 243:
+                case NPCID.IceGolem:
                     {
                         if (npc.HasPlayerTarget && npc.Distance(Main.player[npc.target].Center) > 1000f && npc.Distance(Main.player[npc.target].Center) < 3000f)
                         {
@@ -145,16 +155,18 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             Counter[1] = 0;
                             if (Main.netMode != NetmodeID.MultiplayerClient)
                             {
-                                Projectile.NewProjectile(null, npc.Center, Vector2.UnitY, Mod.Find<ModProjectile>("PhantasmalDeathrayIce").Type, npc.damage / 4, 0f, Main.myPlayer, (float)Math.PI / 120f, npc.whoAmI, 0f);
+                                Projectile.NewProjectile(null, npc.Center, Vector2.UnitY, ModContent.ProjectileType<PhantasmalDeathrayIce>(), npc.damage / 4, 0f, Main.myPlayer, (float)Math.PI / 120f, npc.whoAmI, 0f);
                             }
                         }
                         break;
                     }
-                case 181:
+
+                case NPCID.FaceMonster:
                     Aura(npc, 600f, 80, reverse: true, 199);
                     Aura(npc, 600f, 22, reverse: true, 199);
                     break;
-                case 548:
+
+                case NPCID.DD2EterniaCrystal:
                     if (npc.lifeMax > 100)
                     {
                         npc.lifeMax = 100;
@@ -164,66 +176,79 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         npc.life = npc.lifeMax;
                     }
                     break;
-                case 576:
-                case 577:
+
+                case NPCID.DD2OgreT2:
+                case NPCID.DD2OgreT3:
                     Aura(npc, 500f, 197, reverse: true, 188);
                     break;
-                case 564:
-                    Aura(npc, 900f, MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type, reverse: true, 254);
+
+                case NPCID.DD2DarkMageT1:
+                    Aura(npc, 900f, ModContent.BuffType<HexedBuff>(), reverse: true, 254);
                     break;
-                case 565:
-                    Aura(npc, 600f, MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type, reverse: true, 254);
+
+                case NPCID.DD2DarkMageT3:
+                    Aura(npc, 600f, ModContent.BuffType<HexedBuff>(), reverse: true, 254);
                     break;
-                case 480:
+
+                case NPCID.Medusa:
                     Aura(npc, 400f, 156, reverse: false, 1);
                     break;
-                case 48:
+
+                case NPCID.Harpy:
                     npc.noTileCollide = true;
                     break;
-                case 422:
-                case 493:
-                case 507:
-                case 517:
+
+                case NPCID.LunarTowerVortex:
+                case NPCID.LunarTowerStardust:
+                case NPCID.LunarTowerNebula:
+                case NPCID.LunarTowerSolar:
                     if (npc.position.Y < Main.maxTilesY * 16 / 2)
                         npc.position.Y += 4f / 15f;
                     break;
-                case 63:
-                case 64:
-                case 103:
-                case 242:
-                case 256:
+
+                case NPCID.BlueJellyfish:
+                case NPCID.PinkJellyfish:
+                case NPCID.GreenJellyfish:
+                case NPCID.BloodJelly:
+                case NPCID.FungoFish:
                     Aura(npc, 200f, 144, reverse: false, 226);
                     break;
-                case 28:
-                case 44:
-                case 104:
-                case 216:
-                case 351:
+
+                case NPCID.GoblinWarrior:
+                case NPCID.UndeadMiner:
+                case NPCID.Werewolf:
+                case NPCID.PirateCaptain:
+                case NPCID.Krampus:
                     npc.position.X += npc.velocity.X;
                     if (npc.velocity.Y < 0f)
                         npc.position.Y += npc.velocity.Y;
                     break;
-                case 198:
-                case 199:
-                case 226:
+
+                case NPCID.Lihzahrd:
+                case NPCID.LihzahrdCrawler:
+                case NPCID.FlyingSnake:
                     if (!NPC.downedPlantBoss)
                     {
                         SoundEngine.PlaySound(SoundID.Roar, npc.Center);
-                        npc.Transform(MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+                        npc.Transform(ModContent.NPCType<MutantBoss>());
                     }
                     break;
-                case 327:
-                    Aura(npc, 300f, MasomodeEX.Souls.Find<ModBuff>("MarkedforDeathBuff").Type);
+
+                case NPCID.Pumpking:
+                    Aura(npc, 300f, ModContent.BuffType<MarkedforDeathBuff>());
                     break;
-                case 328:
-                    Aura(npc, 200f, MasomodeEX.Souls.Find<ModBuff>("LivingWastelandBuff").Type);
+
+                case NPCID.PumpkingBlade:
+                    Aura(npc, 200f, ModContent.BuffType<LivingWastelandBuff>());
                     break;
-                case 345:
-                    Aura(npc, 300f, 47);
+
+                case NPCID.IceQueen:
+                    Aura(npc, 300f, BuffID.Frozen);
                     break;
-                case 50:
+
+                case NPCID.KingSlime:
                     {
-                        Aura(npc, 600f, 137, reverse: true, 33);
+                        Aura(npc, 600f, BuffID.Slimed, reverse: true, 33);
                         for (int num = 0; num < 20; num++)
                         {
                             Vector2 offset = default;
@@ -236,6 +261,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                 dust.velocity += Vector2.Normalize(offset) * 5f;
                             dust.noGravity = true;
                         }
+
                         npc.position.X += npc.velocity.X;
                         if (masoBool[1])
                         {
@@ -250,7 +276,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                 dist.X /= 60f;
                                 dist.Y = dist.Y / 60f - 4.5f;
                                 for (int num = 0; num < 10; num++)
-                                    Projectile.NewProjectile(null, npc.Center, dist + Main.rand.NextVector2Square(-1f, 1f), MasomodeEX.Souls.Find<ModProjectile>("RainbowSlimeSpike").Type, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                    Projectile.NewProjectile(null, npc.Center, dist + Main.rand.NextVector2Square(-1f, 1f), ModContent.ProjectileType<RainbowSlimeSpike>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
                             }
                         }
                         
@@ -259,10 +285,11 @@ public class MasomodeEXGlobalNPC : GlobalNPC
 
                         break;
                     }
-                case 4:
+
+                case NPCID.EyeofCthulhu:
                     {
-                        Aura(npc, 600f, MasomodeEX.Souls.Find<ModBuff>("BerserkedBuff").Type, reverse: true);
-                        Aura(npc, 600f, 163, reverse: true, 256);
+                        Aura(npc, 600f, ModContent.BuffType<BerserkedBuff>(), reverse: true);
+                        Aura(npc, 600f, BuffID.Obstructed, reverse: true, 256);
                         if (WorldGen.crimson)
                         {
                             if (++Counter[0] > 240)
@@ -275,7 +302,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                     dist.X /= 360f;
                                     dist.Y = dist.Y / 360f - 13.500001f;
                                     for (int num = 0; num < 10; num++)
-                                        Projectile.NewProjectile(null, npc.Center, dist + Main.rand.NextVector2Square(-1f, 1f), 288, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                        Projectile.NewProjectile(null, npc.Center, dist + Main.rand.NextVector2Square(-1f, 1f), ProjectileID.GoldenShowerHostile, npc.damage / 5, 0f, Main.myPlayer);
                                 }
                             }
                         }
@@ -286,8 +313,8 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                 Counter[1] = 0;
                                 if (Main.netMode != NetmodeID.MultiplayerClient && npc.HasPlayerTarget && npc.life < npc.lifeMax * 0.6)
                                 {
-                                    int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 112, 0, 0f, 0f, 0f, 0f, 255);
-                                    if (n != 200 && Main.netMode == NetmodeID.Server)
+                                    int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.VileSpit, 0, 0f, 0f, 0f, 0f, 255);
+                                    if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                         NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                                 }
                             }
@@ -296,12 +323,13 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             {
                                 Counter[0] = 0;
                                 if (Main.netMode != NetmodeID.MultiplayerClient && npc.life < npc.lifeMax * 0.6)
-                                    Projectile.NewProjectile(null, npc.Center, npc.velocity.RotatedBy((double)MathHelper.ToRadians(Main.rand.NextFloat(-6f, 6f)), default) * 0.66f, 101, npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                    Projectile.NewProjectile(null, npc.Center, npc.velocity.RotatedBy((double)MathHelper.ToRadians(Main.rand.NextFloat(-6f, 6f)), default) * 0.66f, ProjectileID.EyeFire, npc.damage / 5, 0f, Main.myPlayer);
                             }
                         }
 
                         if (++Counter[2] <= 600)
                             break;
+
                         Counter[2] = 0;
                         if (!npc.HasValidTarget)
                             break;
@@ -318,17 +346,18 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             Vector2 speed = Vector2.UnitY;
                             for (int num31 = 0; num31 < 30; num31++)
                             {
-                                Projectile.NewProjectile(null, spawnPos, speed, MasomodeEX.Souls.Find<ModProjectile>("BloodScythe").Type, npc.damage / 4, 1f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, spawnPos, speed, ModContent.ProjectileType<BloodScythe>(), npc.damage / 4, 1f, Main.myPlayer);
                                 spawnPos.X += 72 * direction;
                                 speed.Y += 0.15f;
                             }
                         }
                         break;
                     }
-                case 13:
-                case 14:
+
+                case NPCID.EaterofWorldsHead:
+                case NPCID.EaterofWorldsBody:
                     {
-                        Aura(npc, 50f, MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, reverse: false, 27);
+                        Aura(npc, 50f, ModContent.BuffType<ShadowflameBuff>(), reverse: false, 27);
                         if (!npc.HasValidTarget)
                             break;
 
@@ -483,13 +512,16 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         
                         break;
                     }
-                case 266:
+
+                case NPCID.BrainofCthulhu:
                     if (npc.buffType[0] != 0)
                         npc.DelBuff(0);
                     npc.knockBackResist = 0f;
                     break;
-                case 35:
-                    Aura(npc, 600f, MasomodeEX.Souls.Find<ModBuff>("LethargicBuff").Type, reverse: true, 60);
+
+                case NPCID.SkeletronHead:
+                    Aura(npc, 600f, ModContent.BuffType<LethargicBuff>(), reverse: true, 60);
+
                     if (++Counter[0] > 300)
                     {
                         Counter[0] = 0;
@@ -497,7 +529,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         {
                             Vector2 vel = npc.DirectionTo(Main.player[npc.target].Center) * 3f;
                             for (int num = 0; num < 8; num++)
-                                Projectile.NewProjectile(null, npc.Center, vel.RotatedBy(Math.PI / 4.0 * num, default), 270, npc.damage / 5, 0f, Main.myPlayer, -1f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, vel.RotatedBy(Math.PI / 4.0 * num, default), ProjectileID.Skull, npc.damage / 5, 0f, Main.myPlayer, -1f, 0f, 0f);
                         }
                     }
 
@@ -507,37 +539,40 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
                             int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 44);
-                            if (n < 200 && Main.netMode == NetmodeID.Server)
+                            if (n < Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n, 0f);
                         }
                     }
 
                     npc.localAI[2] += 1f;
                     npc.reflectsProjectiles = npc.ai[1] == 1f || npc.ai[1] == 2f;
-                    
                     break;
-                case 36:
+
+                case NPCID.SkeletronHand:
                     Aura(npc, 140f, 160);
                     fargoNPCOld.Counter[0]--;
                     fargoNPCOld.Counter[1]--;
                     break;
-                case 68:
+
+                case NPCID.DungeonGuardian:
                     if (npc.HasValidTarget)
                         npc.position += npc.DirectionTo(Main.player[npc.target].Center) * 5f;
                     npc.reflectsProjectiles = true;
                     break;
-                case 657:
+
+                case NPCID.QueenSlimeBoss:
                     TrySpawnMinions(ref SpawnedMinions1, 0.75);
                     break;
-                case 222:
+
+                case NPCID.QueenBee:
                     if (!masoBool[0] && npc.HasPlayerTarget)
                     {
                         masoBool[0] = true;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
                         }
                     }
 
@@ -546,90 +581,91 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         masoBool[1] = true;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
-                            NPC.SpawnOnPlayer(npc.target, MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
+                            NPC.SpawnOnPlayer(npc.target, ModContent.NPCType<RoyalSubject>());
                         }
                     }
                     
                     if (--Counter[0] < 0)
                     {
                         Counter[0] = 60;
-                        masoBool[2] = NPC.AnyNPCs(MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
-                        masoBool[2] = NPC.AnyNPCs(MasomodeEX.Souls.Find<ModNPC>("RoyalSubject").Type);
+                        masoBool[2] = NPC.AnyNPCs(ModContent.NPCType<RoyalSubject>());
+                        masoBool[2] = NPC.AnyNPCs(ModContent.NPCType<RoyalSubject>());
                     }
-
                     break;
-                case 210:
-                case 211:
+
+                case NPCID.Bee:
+                case NPCID.BeeSmall:
                     switch (Main.rand.Next(21))
                     {
                         case 0:
-                            npc.Transform(42);
+                            npc.Transform(NPCID.Hornet);
                             break;
                         case 1:
-                            npc.Transform(231);
+                            npc.Transform(NPCID.HornetFatty);
                             break;
                         case 2:
-                            npc.Transform(232);
+                            npc.Transform(NPCID.HornetHoney);
                             break;
                         case 3:
-                            npc.Transform(233);
+                            npc.Transform(NPCID.HornetLeafy);
                             break;
                         case 4:
-                            npc.Transform(234);
+                            npc.Transform(NPCID.HornetSpikey);
                             break;
                         case 5:
-                            npc.Transform(235);
+                            npc.Transform(NPCID.HornetStingy);
                             break;
                         case 6:
-                            npc.Transform(-56);
+                            npc.Transform(NPCID.LittleHornetFatty);
                             break;
                         case 7:
-                            npc.Transform(-58);
+                            npc.Transform(NPCID.LittleHornetHoney);
                             break;
                         case 8:
-                            npc.Transform(-60);
+                            npc.Transform(NPCID.LittleHornetLeafy);
                             break;
                         case 9:
-                            npc.Transform(-62);
+                            npc.Transform(NPCID.LittleHornetSpikey);
                             break;
                         case 10:
-                            npc.Transform(-64);
+                            npc.Transform(NPCID.LittleHornetStingy);
                             break;
                         case 11:
-                            npc.Transform(-57);
+                            npc.Transform(NPCID.BigHornetFatty);
                             break;
                         case 12:
-                            npc.Transform(-59);
+                            npc.Transform(NPCID.BigHornetHoney);
                             break;
                         case 13:
-                            npc.Transform(-61);
+                            npc.Transform(NPCID.LittleHornetLeafy);
                             break;
                         case 14:
-                            npc.Transform(-63);
+                            npc.Transform(NPCID.BigHornetSpikey);
                             break;
                         case 15:
-                            npc.Transform(-65);
+                            npc.Transform(NPCID.BigHornetStingy);
                             break;
                         case 16:
-                            npc.Transform(176);
+                            npc.Transform(NPCID.MossHornet);
                             break;
                         case 17:
-                            npc.Transform(-20);
+                            npc.Transform(NPCID.BigMossHornet);
                             break;
                         case 18:
-                            npc.Transform(-21);
+                            npc.Transform(NPCID.GiantMossHornet);
                             break;
                         case 19:
-                            npc.Transform(-19);
+                            npc.Transform(NPCID.LittleMossHornet);
                             break;
                         case 20:
-                            npc.Transform(-18);
+                            npc.Transform(NPCID.TinyMossHornet);
                             break;
                     }
                     break;
-                case 113:
+
+                case NPCID.WallofFlesh:
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
                         int x = (int)npc.Center.X / 16;
@@ -653,22 +689,24 @@ public class MasomodeEXGlobalNPC : GlobalNPC
 
                     fargoNPCOld.masoBool[0] = true;
                     fargoNPCOld.Counter[0]++;
-                    Main.player[Main.myPlayer].AddBuff(MasomodeEX.Souls.Find<ModBuff>("LowGroundBuff").Type, 2, true, false);
-                    
+                    Main.LocalPlayer.AddBuff(ModContent.BuffType<LowGroundBuff>(), 2, true);
                     break;
-                case 114:
+
+                case NPCID.WallofFleshEye:
                     if (npc.ai[2] != 2f)
                         npc.ai[1] += 1f;
                     break;
-                case 115:
-                case 116:
+
+                case NPCID.TheHungry:
+                case NPCID.TheHungryII:
                     Aura(npc, 100f, 67, reverse: false, 6);
                     break;
-                case 125:
+
+                case NPCID.Retinazer:
                     if (npc.ai[0] < 4f)
                         npc.ai[0] = 4f;
 
-                    Aura(npc, 900f, 69, reverse: true, 90);
+                    Aura(npc, 900f, BuffID.Ichor, reverse: true, 90);
                     if (Counter[0]++ > 240)
                     {
                         Counter[0] = 0;
@@ -679,12 +717,13 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             dist *= 10f;
 
                             for (int num = 0; num < 12; num++)
-                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 6.0 * num, default), ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 6.0 * num, default), ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 5, 0f, Main.myPlayer);
                         }
                     }
 
                     if (++Counter[1] <= 150)
                         break;
+
                     Counter[1] = 0;
                     
                     if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -692,15 +731,15 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         float retiSpeed = 13.08997f;
                         float retiAcc = retiSpeed * retiSpeed / 500f * 1f;
                         for (int num = 0; num < 4; num++)
-                            Projectile.NewProjectile(null, npc.Center, Vector2.UnitX.RotatedBy(Math.PI / 2.0 * num, default) * retiSpeed, MasomodeEX.Souls.Find<ModProjectile>("MutantRetirang").Type, npc.damage / 4, 0f, Main.myPlayer, retiAcc, 240f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, Vector2.UnitX.RotatedBy(Math.PI / 2.0 * num, default) * retiSpeed, ModContent.ProjectileType<MutantRetirang>(), npc.damage / 4, 0f, Main.myPlayer, retiAcc, 240f, 0f);
                     }
-
                     break;
-                case 126:
+
+                case NPCID.Spazmatism:
                     if (npc.ai[0] < 4f)
                         npc.ai[0] = 4f;
 
-                    Aura(npc, 900f, 39, reverse: true, 89);
+                    Aura(npc, 900f, BuffID.CursedInferno, reverse: true, 89);
                     if (Counter[0]++ > 120)
                     {
                         Counter[0] = 0;
@@ -710,12 +749,13 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             dist.Normalize();
                             dist *= 14f;
                             for (int j = 0; j < 8; j++)
-                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 4.0 * j, default), ModContent.ProjectileType<MechElectricOrbSpaz>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                                Projectile.NewProjectile(null, npc.Center, dist.RotatedBy(Math.PI / 4.0 * j, default), ModContent.ProjectileType<MechElectricOrbSpaz>(), npc.damage / 5, 0f, Main.myPlayer);
                         }
                     }
 
                     if (++Counter[1] <= 150)
                         break;
+
                     Counter[1] = 0;
                     
                     if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -723,11 +763,11 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         float spazSpeed = 13.08997f;
                         float spazAcc = spazSpeed * spazSpeed / 250f * -1f;
                         for (int k = 0; k < 4; k++)
-                            Projectile.NewProjectile(null, npc.Center, Vector2.UnitX.RotatedBy(Math.PI / 2.0 * k + Math.PI / 4.0, default) * spazSpeed, MasomodeEX.Souls.Find<ModProjectile>("MutantSpazmarang").Type, npc.damage / 4, 0f, Main.myPlayer, spazAcc, 120f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, Vector2.UnitX.RotatedBy(Math.PI / 2.0 * k + Math.PI / 4.0, default) * spazSpeed, ModContent.ProjectileType<MutantSpazmarang>(), npc.damage / 4, 0f, Main.myPlayer, spazAcc, 120f, 0f);
                     }
-
                     break;
-                case 134:
+
+                case NPCID.TheDestroyer:
                     {
                         if (++Counter[0] > 240)
                         {
@@ -738,11 +778,12 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             if (npc.HasPlayerTarget && Main.netMode != NetmodeID.MultiplayerClient)
                             {
                                 Vector2 vel = npc.DirectionTo(Main.player[npc.target].Center) * 15f;
-                                int current = Projectile.NewProjectile(null, npc.Center, vel, MasomodeEX.Souls.Find<ModProjectile>("MutantDestroyerHead").Type, npc.damage / 4, 0f, Main.myPlayer, npc.target, 0f, 0f);
+                                int current = Projectile.NewProjectile(null, npc.Center, vel, ModContent.ProjectileType<MutantDestroyerHead>(), npc.damage / 4, 0f, Main.myPlayer, npc.target);
                                 for (int num = 0; num < 18; num++)
-                                    current = Projectile.NewProjectile(null, npc.Center, vel, MasomodeEX.Souls.Find<ModProjectile>("MutantDestroyerBody").Type, npc.damage / 4, 0f, Main.myPlayer, current, 0f, 0f);
+                                    current = Projectile.NewProjectile(null, npc.Center, vel, ModContent.ProjectileType<MutantDestroyerBody>(), npc.damage / 4, 0f, Main.myPlayer, current);
                                 int previous = current;
-                                current = Projectile.NewProjectile(null, npc.Center, vel, MasomodeEX.Souls.Find<ModProjectile>("MutantDestroyerTail").Type, npc.damage / 4, 0f, Main.myPlayer, current, 0f, 0f);
+                                current = Projectile.NewProjectile(null, npc.Center, vel, ModContent.ProjectileType<MutantDestroyerTail>(), npc.damage / 4, 0f, Main.myPlayer, current);
+
                                 Main.projectile[previous].localAI[1] = current;
                                 Main.projectile[previous].netUpdate = true;
                             }
@@ -773,7 +814,7 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                 if (!(tile != null) || (!tile.HasUnactuatedTile || !Main.tileSolid[tile.TileType] && (!Main.tileSolidTop[tile.TileType] || tile.TileFrameY != 0)) && tile.LiquidAmount <= 64)
                                     continue;
                                 tilePos2 = new(x3 * 16f, y3 * 16f);
-                                
+
                                 if (npc.position.X + npc.width > tilePos2.X && npc.position.X < tilePos2.X + 16f && npc.position.Y + npc.height > tilePos2.Y && npc.position.Y < tilePos2.Y + 16f)
                                 {
                                     WorldGen.KillTile(x3, y3, false, false, false);
@@ -782,11 +823,11 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                                 }
                             }
                         }
-
-                        break;
                     }
-                case 135:
-                case 136:
+                    break;
+
+                case NPCID.TheDestroyerBody:
+                case NPCID.TheDestroyerTail:
                     if (npc.ai[2] == 0f || ++Counter[0] <= 420)
                         break;
 
@@ -795,31 +836,35 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     {
                         for (int num = 0; num < 6; num++)
                         {
-                            int p = Projectile.NewProjectile(null, npc.Center, Vector2.Normalize(npc.position - Main.player[npc.target].position).RotatedBy(Math.PI / 4.0 * num, default) * 10f, ModContent.ProjectileType<MechElectricOrbHoming>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            int p = Projectile.NewProjectile(null, npc.Center, Vector2.Normalize(npc.position - Main.player[npc.target].position).RotatedBy(Math.PI / 4.0 * num, default) * 10f, ModContent.ProjectileType<MechElectricOrbHoming>(), npc.damage / 5, 0f, Main.myPlayer);
                             Main.projectile[p].ai[2] = 1; // destroyer themed color
                         }
                     }
-
                     break;
-                case 127:
-                    Aura(npc, 100f, MasomodeEX.Souls.Find<ModBuff>("StunnedBuff").Type);
+
+                case NPCID.SkeletronPrime:
+                    Aura(npc, 100f, ModContent.BuffType<StunnedBuff>());
                     npc.reflectsProjectiles = npc.ai[1] == 1f || npc.ai[1] == 2f;
+
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 131, npc.whoAmI, -1f, npc.whoAmI, 0f, 150f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeLaser, npc.whoAmI, -1f, npc.whoAmI, 0f, 150f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 129, npc.whoAmI, -1f, npc.whoAmI, 0f, 0f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeSaw, npc.whoAmI, -1f, npc.whoAmI, 0f, 0f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 128, npc.whoAmI, 1f, npc.whoAmI, 0f, 150f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeCannon, npc.whoAmI, 1f, npc.whoAmI, 0f, 150f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 130, npc.whoAmI, 1f, npc.whoAmI, 0f, 0f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeVice, npc.whoAmI, 1f, npc.whoAmI, 0f, 0f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                         }
                     }
@@ -829,17 +874,20 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         masoBool[1] = true;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 131, npc.whoAmI, -1f, npc.whoAmI, 0f, 150f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeLaser, npc.whoAmI, -1f, npc.whoAmI, 0f, 150f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 129, npc.whoAmI, -1f, npc.whoAmI, 0f, 0f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeSaw, npc.whoAmI, -1f, npc.whoAmI, 0f, 0f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 128, npc.whoAmI, 1f, npc.whoAmI, 0f, 150f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeCannon, npc.whoAmI, 1f, npc.whoAmI, 0f, 150f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 130, npc.whoAmI, 1f, npc.whoAmI, 0f, 0f, npc.target);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                            n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PrimeVice, npc.whoAmI, 1f, npc.whoAmI, 0f, 0f, npc.target);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                         }
 
@@ -851,14 +899,14 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     {
                         Counter[1] = 0;
                         if (Main.netMode != NetmodeID.MultiplayerClient && npc.HasPlayerTarget)
-                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 18f, MasomodeEX.Souls.Find<ModProjectile>("MutantGuardian").Type, npc.damage / 3, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 18f, ModContent.ProjectileType<MutantGuardian>(), npc.damage / 3, 0f, Main.myPlayer);
                     }
-
                     break;
-                case 128:
-                case 129:
-                case 130:
-                case 131:
+
+                case NPCID.PrimeCannon:
+                case NPCID.PrimeSaw:
+                case NPCID.PrimeVice:
+                case NPCID.PrimeLaser:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
@@ -880,59 +928,59 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     {
                         Counter[0] = 0;
                         if (Main.netMode != NetmodeID.MultiplayerClient && npc.HasPlayerTarget)
-                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 14f, ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 4, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 14f, ModContent.ProjectileType<MechElectricOrb>(), npc.damage / 4, 0f, Main.myPlayer);
+                    }
+                    break;
+
+                case NPCID.Plantera:
+                    npc.life += 5;
+                    if (npc.life > npc.lifeMax)
+                        npc.life = npc.lifeMax;
+
+                    if (++Counter[0] > 75)
+                    {
+                        Counter[0] = Main.rand.Next(30);
+                        CombatText.NewText(npc.Hitbox, CombatText.HealLife, 300, false, false);
                     }
 
-                    break;
-                case 262:
+                    if (npc.life >= npc.lifeMax / 2)
+                        break;
+
+                    if (++Counter[1] > 300)
                     {
-                        npc.life += 5;
-                        if (npc.life > npc.lifeMax)
-                            npc.life = npc.lifeMax;
-
-                        if (++Counter[0] > 75)
+                        Counter[1] = 0;
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            Counter[0] = Main.rand.Next(30);
-                            CombatText.NewText(npc.Hitbox, CombatText.HealLife, 300, false, false);
-                        }
-
-                        if (npc.life >= npc.lifeMax / 2)
-                            break;
-                        
-                        if (++Counter[1] > 300)
-                        {
-                            Counter[1] = 0;
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
+                            int tentaclesToSpawn = 6;
+                            for (int i = 0; i < 200; i++)
                             {
-                                int tentaclesToSpawn = 6;
-                                for (int i = 0; i < 200; i++)
-                                {
-                                    if (Main.npc[i].active && Main.npc[i].type == NPCID.PlanterasTentacle && Main.npc[i].ai[3] == 0f)
-                                        tentaclesToSpawn--;
-                                }
+                                if (Main.npc[i].active && Main.npc[i].type == NPCID.PlanterasTentacle && Main.npc[i].ai[3] == 0f)
+                                    tentaclesToSpawn--;
+                            }
 
-                                for (int j = 0; j < tentaclesToSpawn; j++)
-                                {
-                                    int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 264, npc.whoAmI);
-                                    if (Main.netMode == NetmodeID.Server)
-                                        NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                                }
+                            for (int j = 0; j < tentaclesToSpawn; j++)
+                            {
+                                int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.PlanterasTentacle, npc.whoAmI);
+                                if (Main.netMode == NetmodeID.Server)
+                                    NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                             }
                         }
-
-                        if (--Counter[2] < 0)
-                        {
-                            Counter[2] = 180;
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(null, npc.Center, Vector2.Zero, MasomodeEX.Souls.Find<ModProjectile>("MutantMark2").Type, npc.damage / 4, 0f, Main.myPlayer, 30f, 150f, 0f);
-                        }
-                        break;
                     }
-                case 264:
-                    npc.position += npc.velocity;
-                    Aura(npc, 200f, MasomodeEX.Souls.Find<ModBuff>("IvyVenomBuff").Type, reverse: false, 188);
+
+                    if (--Counter[2] < 0)
+                    {
+                        Counter[2] = 180;
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                            Projectile.NewProjectile(null, npc.Center, Vector2.Zero, ModContent.ProjectileType<MutantMark2>(), npc.damage / 4, 0f, Main.myPlayer, 30f, 150f, 0f);
+                    }
                     break;
-                case 245:
+
+                case NPCID.PlanterasTentacle:
+                    npc.position += npc.velocity;
+                    Aura(npc, 200f, ModContent.BuffType<IvyVenomBuff>(), reverse: false, 188);
+                    break;
+
+                case NPCID.Golem:
                     if (npc.dontTakeDamage)
                         break;
 
@@ -951,157 +999,161 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         else if (npc.ai[1] < -5f)
                             npc.ai[1] = -5f;
                     }
+                    break;
 
+                case NPCID.GolemHead:
+                case NPCID.GolemFistLeft:
+                case NPCID.GolemFistRight:
+                    Aura(npc, 200f, ModContent.BuffType<ClippedWingsBuff>());
                     break;
-                case 246:
-                case 247:
-                case 248:
-                    Aura(npc, 200f, MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type);
+
+                case NPCID.GolemHeadFree:
+                    Aura(npc, 200f, ModContent.BuffType<ClippedWingsBuff>());
                     break;
-                case 249:
-                    Aura(npc, 200f, MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type);
-                    break;
-                case 370:
+
+                case NPCID.DukeFishron:
+                    npc.position += npc.velocity;
+
+                    if (--Counter[0] < 0)
+                        Counter[0] = 300;
+
+                    if (!fargoNPCOld.masoBool[3] || --Counter[1] >= 0)
+                        break;
+                    Counter[1] = 240;
+
+                    if (Main.netMode == NetmodeID.MultiplayerClient || !npc.HasPlayerTarget)
+                        break;
+
+                    for (int i = -1; i <= 1; i += 2)
                     {
-                        npc.position += npc.velocity;
-                        if (--Counter[0] < 0)
-                            Counter[0] = 300;
-
-                        if (!fargoNPCOld.masoBool[3] || --Counter[1] >= 0)
-                            break;
-                        Counter[1] = 240;
-
-                        if (Main.netMode == NetmodeID.MultiplayerClient || !npc.HasPlayerTarget)
-                            break;
-
-                        for (int i = -1; i <= 1; i += 2)
+                        int max = 3;
+                        for (int j = -max; j <= max; j++)
                         {
-                            int max = 3;
-                            for (int j = -max; j <= max; j++)
+                            if (Math.Abs(j) == max)
                             {
-                                if (Math.Abs(j) == max)
-                                {
-                                    float spread = (float)Math.PI / 12f;
-                                    Vector2 offset = npc.ai[2] == 0f ? Vector2.UnitY.RotatedBy((double)(spread * j), default) * -450f * i : Vector2.UnitX.RotatedBy((double)(spread * j), default) * 475f * i;
-                                    Projectile.NewProjectile(npc.GetSource_FromThis(null), npc.Center, Vector2.Zero, MasomodeEX.Souls.Find<ModProjectile>("MutantFishron").Type, npc.damage, 0f, Main.myPlayer, offset.X, offset.Y, 0f);
-                                }
+                                float spread = (float)Math.PI / 12f;
+                                Vector2 offset = npc.ai[2] == 0f ? Vector2.UnitY.RotatedBy((double)(spread * j), default) * -450f * i : Vector2.UnitX.RotatedBy((double)(spread * j), default) * 475f * i;
+                                Projectile.NewProjectile(npc.GetSource_FromThis(null), npc.Center, Vector2.Zero, ModContent.ProjectileType<MutantFishron>(), npc.damage, 0f, Main.myPlayer, offset.X, offset.Y, 0f);
                             }
                         }
-                        break;
                     }
-                case 439:
-                    Aura(npc, 600f, MasomodeEX.Souls.Find<ModBuff>("MarkedforDeathBuff").Type, reverse: false, 199);
-                    Aura(npc, 600f, MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type);
+                    break;
+
+                case NPCID.CultistBoss:
+                    Aura(npc, 600f, ModContent.BuffType<MarkedforDeathBuff>(), reverse: false, 199);
+                    Aura(npc, 600f, ModContent.BuffType<HexedBuff>());
+
                     if (++Counter[0] > 60)
                     {
                         Counter[0] = 0;
                         if (Main.netMode != NetmodeID.MultiplayerClient && npc.HasPlayerTarget && !NPC.AnyNPCs(454))
                         {
-                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, 454, 0, 0f, 0f, 0f, 0f, 255);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, NPCID.CultistDragonHead, 0, 0f, 0f, 0f, 0f, 255);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                         }
                     }
 
                     if (masoBool[0])
                         break;
+
                     masoBool[0] = true;
-                    
+ 
                     if (Main.netMode != NetmodeID.MultiplayerClient)
                     {
-                        int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, Mod.Find<ModNPC>("CultistIllusion").Type, npc.whoAmI, npc.whoAmI, -1f, 1f, 0f, 255);
-                        if (n != 200 && Main.netMode == NetmodeID.Server)
+                        int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, ModContent.NPCType<CultistIllusion>(), npc.whoAmI, npc.whoAmI, -1f, 1f, 0f, 255);
+                        if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                             NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                        n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, Mod.Find<ModNPC>("CultistIllusion").Type, npc.whoAmI, npc.whoAmI, 1f, -1f, 0f, 255);
-                        if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                        n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, ModContent.NPCType<CultistIllusion>(), npc.whoAmI, npc.whoAmI, 1f, -1f, 0f, 255);
+                        if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                             NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
-                        n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, Mod.Find<ModNPC>("CultistIllusion").Type, npc.whoAmI, npc.whoAmI, 1f, 1f, 0f, 255);
-                        if (n != 200 && Main.netMode == NetmodeID.Server)
+
+                        n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, ModContent.NPCType<CultistIllusion>(), npc.whoAmI, npc.whoAmI, 1f, 1f, 0f, 255);
+                        if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                             NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                     }
                     break;
-                case 401:
+
+                case NPCID.MoonLordLeechBlob:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
-                        Main.NewText("WHAT ARE YOU DOING TO ME!?! Healing Leech Clots, Recover me at once!", Color.LimeGreen);
+                        FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.NPCYap.MoonLord.Leech", Color.LimeGreen);
                     }
                     break;
-                case 398:
+
+                case NPCID.MoonLordCore:
+                    if (Main.LocalPlayer.active && Main.LocalPlayer.mount.Active)
+                        Main.LocalPlayer.mount.Dismount(Main.LocalPlayer);
+
+                    if (!masoBool[0])
                     {
-                        if (Main.LocalPlayer.active && Main.LocalPlayer.mount.Active)
-                            Main.LocalPlayer.mount.Dismount(Main.LocalPlayer);
+                        npc.TargetClosest(false);
+                        masoBool[0] = true;
 
-                        if (!masoBool[0])
-                        {
-                            npc.TargetClosest(false);
-                            masoBool[0] = true;
-                            
-                            if (NPC.CountNPCS(398) == 1)
-                                Main.LocalPlayer.GetModPlayer<MasomodeEXPlayer>().hitcap = 25;
+                        if (NPC.CountNPCS(NPCID.MoonLordCore) == 1)
+                            Main.LocalPlayer.GetModPlayer<MasomodeEXPlayer>().hitcap = 25;
 
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(null, npc.Center, Vector2.Zero, Mod.Find<ModProjectile>("MoonLordText").Type, 0, 0f, Main.myPlayer, npc.whoAmI, 0f, 0f);
-                        }
-
-                        if (!masoBool[1] && npc.ai[0] == 2f)
-                        {
-                            masoBool[1] = true;
-                            npc.ai[0] = 1f;
-                            npc.ai[1] = 0f;
-                            npc.ai[2] = 0f;
-                            npc.ai[3] = 0f;
-                            npc.life = npc.lifeMax;
-                            npc.netUpdate = true;
-                            Main.NewText("Hehehehehehe! I GUARANTEE YOU DON'T HAVE ENOUGH POWER TO DEFEAT ME!!!", Color.LimeGreen);
-                            return false;
-                        }
-
-                        if (++Counter[0] > 90)
-                        {
-                            Counter[0] = 0;
-                            if (npc.HasPlayerTarget && Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 8f, 462, 30, 0f, Main.myPlayer, 0f, 0f, 0f);
-                        }
-
-                        npc.position += npc.velocity * (1f - npc.life / (float)npc.lifeMax);
-                        
-                        if (masoBool[1])
-                            npc.position += npc.velocity;
-
-                        break;
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                            Projectile.NewProjectile(null, npc.Center, Vector2.Zero, ModContent.ProjectileType<MoonLordText>(), 0, 0f, Main.myPlayer, npc.whoAmI);
                     }
-                case 400:
+
+                    if (!masoBool[1] && npc.ai[0] == 2f)
+                    {
+                        masoBool[1] = true;
+                        npc.ai[0] = 1f;
+                        npc.ai[1] = 0f;
+                        npc.ai[2] = 0f;
+                        npc.ai[3] = 0f;
+                        npc.life = npc.lifeMax;
+                        npc.netUpdate = true;
+
+                        FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.NPCYap.MoonLord.Revive", Color.LimeGreen);
+                        return false;
+                    }
+
+                    if (++Counter[0] > 90)
+                    {
+                        Counter[0] = 0;
+                        if (npc.HasPlayerTarget && Main.netMode != NetmodeID.MultiplayerClient)
+                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 8f, ProjectileID.PhantasmalBolt, 30, 0f, Main.myPlayer);
+                    }
+
+                    npc.position += npc.velocity * (1f - npc.life / (float)npc.lifeMax);
+
+                    if (masoBool[1])
+                        npc.position += npc.velocity;
+                    break;
+
+                case NPCID.MoonLordFreeEye:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
-                        Main.NewText(Main.rand.Next(5) switch
-                        {
-                            0 => "Guys, Will you assist me for a moment?",
-                            1 => "I'm going to bring more of my servants to assist me!",
-                            2 => "Go servants, what are you all waiting for?",
-                            3 => "Servants! Get this little peasant out of my sight at once!",
-                            _ => "Mwahahahahahahahahaha! Trap this tiny struggle at once!",
-                        }, Color.LimeGreen);
 
-                        if (NPC.CountNPCS(400) >= 3)
-                            Main.NewText("Ahhhh, my eyes!", Color.LimeGreen);
+                        if (NPC.CountNPCS(NPCID.MoonLordFreeEye) >= 3)
+                        {
+                            FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.NPCYap.MoonLord.EyesFree", Color.LimeGreen);
+                        }
+
+                        FargoSoulsUtil.PrintLocalization($"Mods.MasomodeEX.NPCYap.MoonLord.PortalSummon{Main.rand.Next(5)}", Color.LimeGreen);
                     }
                     if (++Counter[0] > 90)
                     {
                         Counter[0] = 0;
                         if (npc.HasPlayerTarget && Main.netMode != NetmodeID.MultiplayerClient)
-                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 8f, 462, 30, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, npc.DirectionTo(Main.player[npc.target].Center) * 8f, ProjectileID.PhantasmalBolt, 30, 0f, Main.myPlayer);
                     }
                     break;
-                case 397:
+
+                case NPCID.MoonLordHand:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
                         if (Main.netMode != NetmodeID.MultiplayerClient)
                         {
-                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, npc.ai[2] == 0f ? Mod.Find<ModNPC>("PhantomPortal").Type : Mod.Find<ModNPC>("PurityPortal").Type, npc.whoAmI, npc.whoAmI, 0f, 0f, 0f, 255);
-                            if (n != 200 && Main.netMode == NetmodeID.Server)
+                            int n = NPC.NewNPC(null, (int)npc.Center.X, (int)npc.Center.Y, npc.ai[2] == 0f ? ModContent.NPCType<PhantomPortal>() : ModContent.NPCType<PurityPortal>(), npc.whoAmI, npc.whoAmI);
+                            if (n != Main.maxNPCs && Main.netMode == NetmodeID.Server)
                                 NetMessage.SendData(MessageID.SyncNPC, -1, -1, null, n);
                         }
                     }
@@ -1111,19 +1163,14 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         if (masoBool[1])
                         {
                             masoBool[1] = false;
-                            Main.NewText(Main.rand.Next(3) switch
-                            {
-                                0 => "It looks like you can't defeat me!",
-                                1 => "I see that you have annihilated my son!,You wimp!",
-                                _ => "I still have plenty of gimmicks and tricks left!",
-                            }, (Color?)Color.LimeGreen);
+                            FargoSoulsUtil.PrintLocalization($"Mods.MasomodeEX.NPCYap.MoonLord.Invincible{Main.rand.Next(3)}", Color.LimeGreen);
                         }
                     }
                     else
                         masoBool[1] = true;
-
                     break;
-                case 396:
+
+                case NPCID.MoonLordHead:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
@@ -1135,28 +1182,25 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                         if (masoBool[1])
                         {
                             masoBool[1] = false;
-                            Main.NewText(Main.rand.Next(3) switch
-                            {
-                                0 => "It looks like you can't defeat me!",
-                                1 => "I see that you have annihilated my son!,You wimp!",
-                                _ => "I still have plenty of gimmicks and tricks left!",
-                            }, Color.LimeGreen);
+                            FargoSoulsUtil.PrintLocalization($"Mods.MasomodeEX.NPCYap.MoonLord.Invincible{Main.rand.Next(3)}", Color.LimeGreen);
                         }
                     }
                     else
                         masoBool[1] = true;
-
                     break;
-                case 551:
+
+                case NPCID.DD2Betsy:
                     Aura(npc, 700f, 24, reverse: true, 6);
                     Aura(npc, 700f, 67, reverse: true);
-                    if (Main.player[Main.myPlayer].active && Main.player[Main.myPlayer].Distance(npc.Center) < 700f)
+
+                    if (Main.LocalPlayer.active && Main.LocalPlayer.Distance(npc.Center) < 700f)
                     {
-                        Main.player[Main.myPlayer].AddBuff(195, 2, true, false);
-                        Main.player[Main.myPlayer].AddBuff(196, 2, true, false);
+                        Main.LocalPlayer.AddBuff(BuffID.WitheredArmor, 2, true, false);
+                        Main.LocalPlayer.AddBuff(BuffID.WitheredWeapon, 2, true, false);
                     }
                     break;
-                case 2:
+
+                case NPCID.DemonEye:
                     if (!masoBool[0])
                     {
                         masoBool[0] = true;
@@ -1164,130 +1208,131 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             npc.Transform(133);
                     }
                     break;
-                case 477:
-                case 479:
-                    {
-                        for (int i = 0; i < 2; i++)
-                        {
-                            int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.PurpleCrystalShard, 0f, 0f, 0, default, 1f);
-                            Main.dust[d].scale += 1f;
-                            Main.dust[d].noGravity = true;
-                            Main.dust[d].velocity *= 5f;
-                        }
 
-                        if (++Counter[0] > 6)
-                        {
-                            Counter[0] = 0;
-                            if (Main.netMode != NetmodeID.MultiplayerClient)
-                                Projectile.NewProjectile(null, npc.Center, Main.rand.NextVector2Unit(0f, (float)Math.PI * 2f) * 12f, ModContent.ProjectileType<MothDust>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
-                        }
-                        break;
+                case NPCID.Mothron:
+                case NPCID.MothronSpawn:
+                    for (int i = 0; i < 2; i++)
+                    {
+                        int d = Dust.NewDust(npc.position, npc.width, npc.height, DustID.PurpleCrystalShard, 0f, 0f, 0, default, 1f);
+                        Main.dust[d].scale += 1f;
+                        Main.dust[d].noGravity = true;
+                        Main.dust[d].velocity *= 5f;
                     }
-                case 290:
+
+                    if (++Counter[0] > 6)
+                    {
+                        Counter[0] = 0;
+                        if (Main.netMode != NetmodeID.MultiplayerClient)
+                            Projectile.NewProjectile(null, npc.Center, Main.rand.NextVector2Unit(0f, (float)Math.PI * 2f) * 12f, ModContent.ProjectileType<MothDust>(), npc.damage / 5, 0f, Main.myPlayer, 0f, 0f, 0f);
+                    }
+                    break;
+
+                case NPCID.Paladin:
                     npc.reflectsProjectiles = true;
                     break;
-                case 133:
+
+                case NPCID.WanderingEye:
                     npc.noTileCollide = true;
                     break;
-                case 109:
+
+                case NPCID.Clown:
+                    if (npc.Distance(Main.LocalPlayer.Center) > 500f)
                     {
-                        if (npc.Distance(Main.player[Main.myPlayer].Center) > 500f)
+                        Main.LocalPlayer.AddBuff(ModContent.BuffType<AtrophiedBuff>(), 2);
+                        Main.LocalPlayer.AddBuff(ModContent.BuffType<JammedBuff>(), 2);
+                        Main.LocalPlayer.AddBuff(ModContent.BuffType<ReverseManaFlowBuff>(), 2);
+                        Main.LocalPlayer.AddBuff(ModContent.BuffType<AntisocialBuff>(), 2);
+                    }
+
+                    for (int l = 0; l < 20; l++)
+                    {
+                        int type = 127;
+                        switch (Main.rand.Next(4))
                         {
-                            Main.player[Main.myPlayer].AddBuff(MasomodeEX.Souls.Find<ModBuff>("AtrophiedBuff").Type, 2, true, false);
-                            Main.player[Main.myPlayer].AddBuff(MasomodeEX.Souls.Find<ModBuff>("JammedBuff").Type, 2, true, false);
-                            Main.player[Main.myPlayer].AddBuff(MasomodeEX.Souls.Find<ModBuff>("ReverseManaFlowBuff").Type, 2, true, false);
-                            Main.player[Main.myPlayer].AddBuff(MasomodeEX.Souls.Find<ModBuff>("AntisocialBuff").Type, 2, true, false);
-                        }
-
-                        for (int l = 0; l < 20; l++)
-                        {
-                            int type = 127;
-                            switch (Main.rand.Next(4))
-                            {
-                                case 1:
-                                    type = 229;
-                                    break;
-                                case 2:
-                                    type = 242;
-                                    break;
-                                case 3:
-                                    type = 135;
-                                    break;
-                            }
-
-                            Vector2 offset = default;
-                            double angle = Main.rand.NextDouble() * 2.0 * Math.PI;
-                            offset.X += (float)(Math.Sin(angle) * 450.0);
-                            offset.Y += (float)(Math.Cos(angle) * 450.0);
-                            Dust dust = Main.dust[Dust.NewDust(npc.Center + offset - new Vector2(4f, 4f), 0, 0, type, 0f, 0f, 100, Color.White, 1f)];
-                            dust.velocity = npc.velocity;
-                            if (Main.rand.NextBool(3))
-                                dust.velocity += Vector2.Normalize(offset) * 5f;
-                            dust.noGravity = true;
-                        }
-
-                        if (++Counter[0] <= 1100)
-                            break;
-                        
-                        npc.life = 0;
-                        SoundEngine.PlaySound(npc.DeathSound, (Vector2?)npc.Center, null);
-                        npc.active = false;
-                        bool bossAlive = false;
-
-                        for (int m = 0; m < 200; m++)
-                        {
-                            if (Main.npc[m].boss && Main.npc[m].active)
-                            {
-                                bossAlive = true;
+                            case 1:
+                                type = 229;
                                 break;
-                            }
+                            case 2:
+                                type = 242;
+                                break;
+                            case 3:
+                                type = 135;
+                                break;
                         }
 
-                        if (Main.netMode == NetmodeID.MultiplayerClient)
-                            break;
+                        Vector2 offset = default;
+                        double angle = Main.rand.NextDouble() * 2.0 * Math.PI;
+                        offset.X += (float)(Math.Sin(angle) * 450.0);
+                        offset.Y += (float)(Math.Cos(angle) * 450.0);
+                        Dust dust = Main.dust[Dust.NewDust(npc.Center + offset - new Vector2(4f, 4f), 0, 0, type, 0f, 0f, 100, Color.White, 1f)];
+                        dust.velocity = npc.velocity;
+                        if (Main.rand.NextBool(3))
+                            dust.velocity += Vector2.Normalize(offset) * 5f;
+                        dust.noGravity = true;
+                    }
 
-                        if (bossAlive)
+                    if (++Counter[0] <= 1100)
+                        break;
+
+                    npc.life = 0;
+                    SoundEngine.PlaySound(npc.DeathSound, (Vector2?)npc.Center, null);
+                    npc.active = false;
+                    bool bossAlive = false;
+
+                    for (int m = 0; m < 200; m++)
+                    {
+                        if (Main.npc[m].boss && Main.npc[m].active)
                         {
-                            Projectile.NewProjectile(null, npc.Center, Vector2.Zero, 516, 100, 8f, Main.myPlayer, 0f, 0f, 0f);
+                            bossAlive = true;
                             break;
                         }
+                    }
 
-                        for (int n = 0; n < 100; n++)
-                        {
-                            int type2 = 28;
-                            int damage = 100;
-                            float knockback = 8f;
-                            switch (Main.rand.Next(6))
-                            {
-                                case 1:
-                                    type2 = 37;
-                                    break;
-                                case 2:
-                                    type2 = 516;
-                                    break;
-                                case 3:
-                                    type2 = 30;
-                                    damage = 60;
-                                    break;
-                                case 4:
-                                    type2 = 397;
-                                    damage = 60;
-                                    break;
-                                case 5:
-                                    type2 = 517;
-                                    damage = 60;
-                                    break;
-                            }
+                    if (Main.netMode == NetmodeID.MultiplayerClient)
+                        break;
 
-                            int p = Projectile.NewProjectile(null, npc.position.X + Main.rand.Next(npc.width), npc.position.Y + Main.rand.Next(npc.height), Main.rand.Next(-1000, 1001) / 50f, Main.rand.Next(-2000, 101) / 50f, type2, damage, knockback, Main.myPlayer, 0f, 0f, 0f);
-                            Main.projectile[p].timeLeft += Main.rand.Next(180);
-                        }
-
+                    if (bossAlive)
+                    {
+                        Projectile.NewProjectile(null, npc.Center, Vector2.Zero, ProjectileID.BouncyBomb, 100, 8f, Main.myPlayer, 0f, 0f, 0f);
                         break;
                     }
-                case 491:
+
+                    for (int n = 0; n < 100; n++)
+                    {
+                        int type2 = 28;
+                        int damage = 100;
+                        float knockback = 8f;
+                        switch (Main.rand.Next(6))
+                        {
+                            case 1:
+                                type2 = 37;
+                                break;
+                            case 2:
+                                type2 = 516;
+                                break;
+                            case 3:
+                                type2 = 30;
+                                damage = 60;
+                                break;
+                            case 4:
+                                type2 = 397;
+                                damage = 60;
+                                break;
+                            case 5:
+                                type2 = 517;
+                                damage = 60;
+                                break;
+                        }
+
+                        int p = Projectile.NewProjectile(null, npc.position.X + Main.rand.Next(npc.width), npc.position.Y + Main.rand.Next(npc.height), Main.rand.Next(-1000, 1001) / 50f, Main.rand.Next(-2000, 101) / 50f, type2, damage, knockback, Main.myPlayer, 0f, 0f, 0f);
+                        Main.projectile[p].timeLeft += Main.rand.Next(180);
+                    }
+                    break;
+
+                case NPCID.PirateShip:
                     if (++Counter[0] <= 300)
                         break;
+
                     Counter[0] = 0;
                     
                     if (Main.netMode != NetmodeID.MultiplayerClient)
@@ -1305,17 +1350,21 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                             Vector2 cannonSpeed = speed;
                             cannonSpeed.X += Main.rand.Next(-10, 11) * 0.3f;
                             cannonSpeed.Y += Main.rand.Next(-10, 11) * 0.3f;
-                            Projectile.NewProjectile(null, npc.Center, cannonSpeed, 240, Main.expertMode ? 80 : 100, 0f, Main.myPlayer, 0f, 0f, 0f);
+                            Projectile.NewProjectile(null, npc.Center, cannonSpeed, ProjectileID.CannonballHostile, Main.expertMode ? 80 : 100, 0f, Main.myPlayer);
                         }
                     }
-
                     break;
             }
 
-            if (npc.type == MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type && !MasomodeEX.Instance.HyperLoaded)
+            if (npc.type == ModContent.NPCType<MutantBoss>() && !MasomodeEX.Instance.HyperLoaded)
                 npc.position += npc.velocity * 0.7f;
             
-            if ((npc.type == MasomodeEX.Souls.Find<ModNPC>("CosmosChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("EarthChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("LifeChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("NatureChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("ShadowChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("SpiritChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("TerraChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("TimberChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("WillChampion").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("LesserFairy").Type || npc.type == MasomodeEX.Souls.Find<ModNPC>("LesserSquirrel").Type) && !MasomodeEX.Instance.HyperLoaded && ++Counter[0] > 3)
+            if ((npc.type == ModContent.NPCType<CosmosChampion>() || npc.type == ModContent.NPCType<EarthChampion>() || 
+                npc.type == ModContent.NPCType<LifeChampion>() || npc.type == ModContent.NPCType<NatureChampion>() || 
+                npc.type == ModContent.NPCType<ShadowChampion>() || npc.type == ModContent.NPCType<SpiritChampion>() || 
+                npc.type == ModContent.NPCType<TerraChampion>() || npc.type == ModContent.NPCType<TimberChampion>() || 
+                npc.type == ModContent.NPCType<WillChampion>() || npc.type == ModContent.NPCType<LesserFairy>() || 
+                npc.type == ModContent.NPCType<LesserSquirrel>()) && !MasomodeEX.Instance.HyperLoaded && ++Counter[0] > 3)
             {
                 Counter[0] = 0;
                 npc.position += npc.velocity * 1.2f;
@@ -1333,22 +1382,22 @@ public class MasomodeEXGlobalNPC : GlobalNPC
             {
                 check = true;
                 for (int i = 0; i < 5; i++)
-                    MasoModeUtils.NewNPCEasy(npc.GetSource_FromAI(null), npc.Center, MasomodeEX.Souls.Find<ModNPC>("GelatinSubject").Type, npc.whoAmI, 0f, 0f, 0f, 0f, npc.target, Main.rand.NextFloat(8f) * npc.DirectionFrom(Main.player[npc.target].Center).RotatedByRandom(MathHelper.PiOver2));
+                    MasoModeUtils.NewNPCEasy(npc.GetSource_FromAI(null), npc.Center, ModContent.NPCType<GelatinSubject>(), npc.whoAmI, 0f, 0f, 0f, 0f, npc.target, Main.rand.NextFloat(8f) * npc.DirectionFrom(Main.player[npc.target].Center).RotatedByRandom(MathHelper.PiOver2));
             }
         }
     }
 
-    public override void OnHitPlayer(NPC npc, Player target, HurtInfo hurtInfo)
+    public override void OnHitPlayer(NPC npc, Player target, Player.HurtInfo hurtInfo)
     {
         if (!MasoModeUtils.checkIfMasoEX())
             return;
 
         if (npc.type != NPCID.DemonEye && npc.type != NPCID.DemonEyeOwl && npc.type != NPCID.DemonEyeSpaceship)
-            target.AddBuff(156, 15);
+            target.AddBuff(BuffID.Stoned, 15);
 
         switch (npc.type)
         {
-            case 48:
+            case NPCID.Harpy:
                 if (target.whoAmI == Main.myPlayer && !target.GetModPlayer<FargoSoulsPlayer>().SecurityWallet)
                 {
                     if (!StealFromInventory(target, ref Main.mouseItem))
@@ -1363,174 +1412,197 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                     }
                 }
                 break;
-            case 412:
-            case 413:
-            case 414:
-            case 421:
-            case 427:
-                target.AddBuff(164, Main.rand.Next(300));
+
+            case NPCID.SolarCrawltipedeHead:
+            case NPCID.SolarCrawltipedeBody:
+            case NPCID.SolarCrawltipedeTail:
+            case NPCID.NebulaHeadcrab:
+            case NPCID.VortexHornet:
+                target.AddBuff(BuffID.VortexDebuff, Main.rand.Next(300));
                 break;
-            case 418:
-            case 419:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, Main.rand.Next(300));
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("FlippedBuff").Type, Main.rand.Next(300));
+
+            case NPCID.SolarCorite:
+            case NPCID.SolarSolenian:
+                target.AddBuff(ModContent.BuffType<ClippedWingsBuff>(), Main.rand.Next(300));
+                target.AddBuff(ModContent.BuffType<FlippedBuff>(), Main.rand.Next(300));
                 break;
-            case 1:
+
+            case NPCID.BlueSlime:
                 if (npc.netID == -4)
                 {
-                    target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("StunnedBuff").Type, 60);
+                    target.AddBuff(ModContent.BuffType<StunnedBuff>(), 60);
                     target.velocity.X = target.Center.X < npc.Center.X ? -500f : 500f;
                     target.velocity.Y = -100f;
                 }
                 break;
-            case 535:
-                npc.Transform(50);
+
+            case NPCID.SlimeSpiked:
+                npc.Transform(NPCID.KingSlime);
                 break;
-            case 2:
-                target.AddBuff(156, Main.rand.Next(300));
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type, Main.rand.Next(300));
-                npc.Transform(133);
+
+            case NPCID.DemonEye:
+                target.AddBuff(BuffID.Stoned, Main.rand.Next(300));
+                target.AddBuff(ModContent.BuffType<HexedBuff>(), Main.rand.Next(300));
+                npc.Transform(NPCID.WanderingEye);
                 break;
-            case 133:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type, Main.rand.Next(300));
-                npc.Transform(4);
+
+            case NPCID.WanderingEye:
+                target.AddBuff(ModContent.BuffType<HexedBuff>(), Main.rand.Next(300));
+                npc.Transform(NPCID.EyeofCthulhu);
                 break;
-            case 94:
-                npc.Transform(13);
-                target.AddBuff(39, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(33, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, Main.rand.Next(60, 600));
+
+            case NPCID.Corruptor:
+                npc.Transform(NPCID.EaterofWorldsHead);
+                target.AddBuff(BuffID.CursedInferno, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Weak, Main.rand.Next(7200));
+                target.AddBuff(ModContent.BuffType<ShadowflameBuff>(), Main.rand.Next(60, 600));
                 break;
-            case 268:
-                npc.Transform(266);
-                target.AddBuff(69, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(30, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("BloodthirstyBuff").Type, Main.rand.Next(300));
+
+            case NPCID.IchorSticker:
+                npc.Transform(NPCID.BrainofCthulhu);
+                target.AddBuff(BuffID.Ichor, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Bleeding, Main.rand.Next(7200));
+                target.AddBuff(ModContent.BuffType<BloodthirstyBuff>(), Main.rand.Next(300));
                 break;
-            case 170:
-            case 171:
-            case 180:
-                npc.Transform(370);
+
+            case NPCID.PigronCorruption:
+            case NPCID.PigronHallow:
+            case NPCID.PigronCrimson:
+                npc.Transform(NPCID.DukeFishron);
                 break;
-            case 6:
-                target.AddBuff(39, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(33, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, Main.rand.Next(60, 600));
-                if (target.statLife + hurtInfo.Damage < 100 && NPC.AnyNPCs(13))
-                    target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " was eaten alive by Eater of Souls."), 999.0, 0, false);
+
+            case NPCID.EaterofSouls:
+                target.AddBuff(BuffID.CursedInferno, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Weak, Main.rand.Next(7200));
+                target.AddBuff(ModContent.BuffType<ShadowflameBuff>(), Main.rand.Next(60, 600));
+
+                if (target.statLife + hurtInfo.Damage < 100 && NPC.AnyNPCs(NPCID.EaterofWorldsHead))
+                    target.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.MasomodeEX.PlayerDeathReasons.EoWOneShot", target.name)), 999.0, 0);
+
                 npc.Transform(94);
                 break;
-            case 13:
-                target.AddBuff(39, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(33, 7200, true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, Main.rand.Next(60, 600));
+
+            case NPCID.EaterofWorldsHead:
+                target.AddBuff(BuffID.CursedInferno, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Weak, 7200);
+                target.AddBuff(ModContent.BuffType<ShadowflameBuff>(), Main.rand.Next(60, 600));
+
                 if (target.statLife + hurtInfo.Damage < 150)
-                    target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " was eaten alive by Eater of Worlds."), 999.0, 0, false);
+                    target.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.MasomodeEX.PlayerDeathReasons.EoWOneShot", target.name)), 999.0, 0);
                 break;
-            case 14:
-            case 15:
-                target.AddBuff(39, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(33, 7200, true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, Main.rand.Next(60, 600));
+
+            case NPCID.EaterofWorldsBody:
+            case NPCID.EaterofWorldsTail:
+                target.AddBuff(BuffID.CursedInferno, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Weak, 7200);
+                target.AddBuff(ModContent.BuffType<ShadowflameBuff>(), Main.rand.Next(60, 600));
                 break;
-            case 125:
-            case 126:
-            case 127:
-            case 128:
-            case 129:
-            case 130:
-            case 131:
-            case 135:
-            case 136:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300);
+
+            case NPCID.Retinazer:
+            case NPCID.Spazmatism:
+            case NPCID.SkeletronPrime:
+            case NPCID.PrimeCannon:
+            case NPCID.PrimeSaw:
+            case NPCID.PrimeVice:
+            case NPCID.PrimeLaser:
+            case NPCID.TheDestroyerBody:
+            case NPCID.TheDestroyerTail:
+                target.AddBuff(ModContent.BuffType<ClippedWingsBuff>(), 300);
                 break;
-            case 139:
-                {
-                    target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300);
-                    NPC.SpawnOnPlayer(target.whoAmI, 127);
-                    NPC.SpawnOnPlayer(target.whoAmI, 125);
-                    NPC.SpawnOnPlayer(target.whoAmI, 126);
-                    NPC.SpawnOnPlayer(target.whoAmI, 134);
-                    break;
-                }
-            case 134:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ClippedWingsBuff").Type, 300, true, false);
+
+            case NPCID.Probe:
+                target.AddBuff(ModContent.BuffType<ClippedWingsBuff>(), 300);
+                NPC.SpawnOnPlayer(target.whoAmI, NPCID.SkeletronPrime);
+                NPC.SpawnOnPlayer(target.whoAmI, NPCID.Retinazer);
+                NPC.SpawnOnPlayer(target.whoAmI, NPCID.Spazmatism);
+                NPC.SpawnOnPlayer(target.whoAmI, NPCID.TheDestroyer);
+                break;
+
+            case NPCID.TheDestroyer:
+                target.AddBuff(ModContent.BuffType<ClippedWingsBuff>(), 300, true, false);
+
                 if (target.statLife + hurtInfo.Damage < 300)
-                    target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " was eaten alive by The Destroyer."), 999.0, 0, false);
+                    target.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.MasomodeEX.PlayerDeathReasons.TheDestroyer", target.name)), 999.0, 0);
                 break;
-            case 348:
-            case 349:
+
+            case NPCID.Nutcracker:
+            case NPCID.NutcrackerSpinning:
                 if (target.Male)
-                    target.KillMe(PlayerDeathReason.ByCustomReason(target.name + " got his nuts cracked."), 9999.0, 0, false);
+                    target.KillMe(PlayerDeathReason.ByCustomReason(NetworkText.FromKey("Mods.MasomodeEX.PlayerDeathReasons.NutCracker", target.name)), 9999.0, 0);
                 break;
-            case 75:
-            case 80:
-            case 84:
-            case 86:
-            case 120:
-            case 122:
-            case 137:
-            case 138:
-            case 244:
-            case 475:
-            case 527:
-            case 545:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("UnstableBuff").Type, Main.rand.Next(60, 300), true, false);
-                target.AddBuff(31, Main.rand.Next(300, 1200), true, false);
+
+            case NPCID.Pixie:
+            case NPCID.LightMummy:
+            case NPCID.EnchantedSword:
+            case NPCID.Unicorn:
+            case NPCID.ChaosElemental:
+            case NPCID.Gastropod:
+            case NPCID.IlluminantBat:
+            case NPCID.IlluminantSlime:
+            case NPCID.RainbowSlime:
+            case NPCID.BigMimicHallow:
+            case NPCID.DesertGhoulHallow:
+            case NPCID.SandsharkHallow:
+                target.AddBuff(ModContent.BuffType<UnstableBuff>(), Main.rand.Next(60, 300));
+                target.AddBuff(BuffID.Confused, Main.rand.Next(300, 1200));
                 break;
-            case -2:
-            case -1:
-            case 7:
-            case 8:
-            case 9:
-            case 47:
-            case 57:
-            case 81:
-            case 83:
-            case 98:
-            case 99:
-            case 100:
-            case 101:
-            case 112:
-            case 121:
-            case 168:
-            case 473:
-            case 525:
-            case 543:
-                target.AddBuff(39, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(33, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("ShadowflameBuff").Type, Main.rand.Next(60, 600), true, false);
+
+            case NPCID.Slimer2:
+            case NPCID.Slimeling:
+            case NPCID.DevourerHead:
+            case NPCID.DevourerBody:
+            case NPCID.DevourerTail:
+            case NPCID.CorruptBunny:
+            case NPCID.CorruptGoldfish:
+            case NPCID.CorruptSlime:
+            case NPCID.CursedHammer:
+            case NPCID.SeekerHead:
+            case NPCID.SeekerBody:
+            case NPCID.SeekerTail:
+            case NPCID.Clinger:
+            case NPCID.VileSpit:
+            case NPCID.Slimer:
+            case NPCID.CorruptPenguin:
+            case NPCID.BigMimicCorruption:
+            case NPCID.DesertGhoulCorruption:
+            case NPCID.SandsharkCorrupt:
+                target.AddBuff(BuffID.CursedInferno, Main.rand.Next(60, 600));
+                target.AddBuff(BuffID.Weak, Main.rand.Next(7200));
+                target.AddBuff(ModContent.BuffType<ShadowflameBuff>(), Main.rand.Next(60, 600));
                 break;
-            case 174:
-            case 179:
-            case 181:
-            case 182:
-            case 183:
-            case 239:
-            case 240:
-            case 241:
-            case 242:
-            case 266:
-            case 267:
-            case 464:
-            case 465:
-            case 470:
-            case 474:
-            case 526:
-            case 544:
-                target.AddBuff(69, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(30, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("BloodthirstyBuff").Type, Main.rand.Next(300), true, false);
+
+            case NPCID.Herpling:
+            case NPCID.CrimsonAxe:
+            case NPCID.FaceMonster:
+            case NPCID.FloatyGross:
+            case NPCID.Crimslime:
+            case NPCID.BloodCrawler:
+            case NPCID.BloodCrawlerWall:
+            case NPCID.BloodFeeder:
+            case NPCID.BloodJelly:
+            case NPCID.BrainofCthulhu:
+            case NPCID.Creeper:
+            case NPCID.CrimsonBunny:
+            case NPCID.CrimsonGoldfish:
+            case NPCID.CrimsonPenguin:
+            case NPCID.BigMimicCrimson:
+            case NPCID.DesertGhoulCrimson:
+            case NPCID.SandsharkCrimson:
+                target.AddBuff(BuffID.Ichor, Main.rand.Next(60, 600), true, false);
+                target.AddBuff(BuffID.Bleeding, Main.rand.Next(7200), true, false);
+                target.AddBuff(ModContent.BuffType<BloodthirstyBuff>(), Main.rand.Next(300));
                 break;
-            case 173:
-                target.AddBuff(69, Main.rand.Next(60, 600), true, false);
-                target.AddBuff(30, Main.rand.Next(7200), true, false);
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("BloodthirstyBuff").Type, Main.rand.Next(300), true, false);
+
+            case NPCID.Crimera:
+                target.AddBuff(BuffID.Ichor, Main.rand.Next(60, 600), true, false);
+                target.AddBuff(BuffID.Bleeding, Main.rand.Next(7200), true, false);
+                target.AddBuff(ModContent.BuffType<BloodthirstyBuff>(), Main.rand.Next(300));
                 npc.Transform(268);
                 break;
-            case 4:
-            case 5:
-                target.AddBuff(MasomodeEX.Souls.Find<ModBuff>("HexedBuff").Type, Main.rand.Next(300), true, false);
+
+            case NPCID.EyeofCthulhu:
+            case NPCID.ServantofCthulhu:
+                target.AddBuff(ModContent.BuffType<HexedBuff>(), Main.rand.Next(300));
                 break;
         }
     }
@@ -1540,33 +1612,38 @@ public class MasomodeEXGlobalNPC : GlobalNPC
         float newDamage = damage;
         switch (npc.type)
         {
-            case 266:
+            case NPCID.BrainofCthulhu:
                 if (Main.netMode != NetmodeID.MultiplayerClient && Main.rand.NextBool(2) & npc.HasPlayerTarget)
                 {
                     Vector2 distance = Main.player[npc.target].Center - npc.Center;
                     if (Main.rand.NextBool(2))
                         distance.X *= -1f;
+
                     if (Main.rand.NextBool(2))
                         distance.Y *= -1f;
+
                     npc.Center = Main.player[npc.target].Center + distance;
                     npc.netUpdate = true;
                 }
                 break;
-            case 222:
+
+            case NPCID.QueenBee:
                 if (masoBool[2])
                     newDamage = 0f;
                 break;
-            case 419:
+
+            case NPCID.SolarSolenian:
                 if (npc.ai[2] <= -6f)
                     newDamage = 0f;
                 break;
-            case 396:
-            case 397:
-            case 398:
+
+            case NPCID.MoonLordHead:
+            case NPCID.MoonLordHand:
+            case NPCID.MoonLordCore:
                 if (damage > npc.lifeMax / 10)
                 {
                     newDamage = 0f;
-                    Main.NewText("YOU THINK YOU CAN BUTCHER A GREAT LORD!?!", (Color?)Color.LimeGreen);
+                    FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.NPCYap.MoonLord.OneShotProtection", Color.LimeGreen);
                 }
                 break;
         }
@@ -1577,78 +1654,81 @@ public class MasomodeEXGlobalNPC : GlobalNPC
     {
         switch (npc.type)
         {
-            case 75:
-            case 80:
-            case 84:
-            case 86:
-            case 120:
-            case 122:
-            case 137:
-            case 138:
-            case 244:
-            case 475:
-            case 527:
-            case 545:
+            case NPCID.Pixie:
+            case NPCID.LightMummy:
+            case NPCID.EnchantedSword:
+            case NPCID.Unicorn:
+            case NPCID.ChaosElemental:
+            case NPCID.Gastropod:
+            case NPCID.IlluminantBat:
+            case NPCID.IlluminantSlime:
+            case NPCID.RainbowSlime:
+            case NPCID.BigMimicHallow:
+            case NPCID.DesertGhoulHallow:
+            case NPCID.SandsharkHallow:
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     for (int i = 0; i < 8; i++)
-                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * i, default) * 4f, 146, 0, 0f, Main.myPlayer, 8f, 0f, 0f);
+                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * i, default) * 4f, ProjectileID.HallowSpray, 0, 0f, Main.myPlayer, 8f);
                 }
                 break;
-            case -2:
-            case -1:
-            case 6:
-            case 7:
-            case 8:
-            case 9:
-            case 14:
-            case 15:
-            case 47:
-            case 57:
-            case 81:
-            case 83:
-            case 94:
-            case 98:
-            case 99:
-            case 100:
-            case 101:
-            case 112:
-            case 121:
-            case 168:
-            case 473:
-            case 525:
-            case 543:
+
+            case NPCID.Slimer2:
+            case NPCID.Slimeling:
+            case NPCID.EaterofSouls:
+            case NPCID.DevourerHead:
+            case NPCID.DevourerBody:
+            case NPCID.DevourerTail:
+            case NPCID.EaterofWorldsBody:
+            case NPCID.EaterofWorldsTail:
+            case NPCID.CorruptBunny:
+            case NPCID.CorruptGoldfish:
+            case NPCID.CorruptSlime:
+            case NPCID.CursedHammer:
+            case NPCID.Corruptor:
+            case NPCID.SeekerHead:
+            case NPCID.SeekerBody:
+            case NPCID.SeekerTail:
+            case NPCID.Clinger:
+            case NPCID.VileSpit:
+            case NPCID.Slimer:
+            case NPCID.CorruptPenguin:
+            case NPCID.BigMimicCorruption:
+            case NPCID.DesertGhoulCorruption:
+            case NPCID.SandsharkCorrupt:
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     for (int k = 0; k < 8; k++)
-                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * k, default) * 4f, 147, 0, 0f, Main.myPlayer, 8f, 0f, 0f);
+                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * k, default) * 4f, ProjectileID.CorruptSpray, 0, 0f, Main.myPlayer, 8f);
                 }
                 break;
-            case 173:
-            case 174:
-            case 179:
-            case 181:
-            case 182:
-            case 183:
-            case 239:
-            case 240:
-            case 241:
-            case 242:
-            case 266:
-            case 267:
-            case 464:
-            case 465:
-            case 470:
-            case 474:
-            case 526:
-            case 544:
+
+            case NPCID.Crimera:
+            case NPCID.Herpling:
+            case NPCID.CrimsonAxe:
+            case NPCID.FaceMonster:
+            case NPCID.FloatyGross:
+            case NPCID.Crimslime:
+            case NPCID.BloodCrawler:
+            case NPCID.BloodCrawlerWall:
+            case NPCID.BloodFeeder:
+            case NPCID.BloodJelly:
+            case NPCID.BrainofCthulhu:
+            case NPCID.Creeper:
+            case NPCID.CrimsonBunny:
+            case NPCID.CrimsonGoldfish:
+            case NPCID.CrimsonPenguin:
+            case NPCID.BigMimicCrimson:
+            case NPCID.DesertGhoulCrimson:
+            case NPCID.SandsharkCrimson:
                 if (Main.netMode != NetmodeID.MultiplayerClient)
                 {
                     for (int j = 0; j < 8; j++)
-                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * j, default) * 4f, 149, 0, 0f, Main.myPlayer, 8f, 0f, 0f);
+                        Projectile.NewProjectile(null, npc.Center, Vector2.UnitY.RotatedBy(Math.PI / 4.0 * j, default) * 4f, ProjectileID.CrimsonSpray, 0, 0f, Main.myPlayer, 8f);
                 }
                 break;
-            case 23:
+
+            case NPCID.MeteorHead:
                 if (!NPC.downedBoss2)
                 {
                     SoundEngine.PlaySound(npc.DeathSound, (Vector2?)npc.Center, null);
@@ -1665,36 +1745,28 @@ public class MasomodeEXGlobalNPC : GlobalNPC
                 int mutant = NPC.FindFirstNPC(MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type);
                 if (mutant > -1 && Main.npc[mutant].active)
                 {
-                    Main.npc[mutant].Transform(MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
-                    if (Main.netMode == NetmodeID.SinglePlayer)
-                        Main.NewText("Mutant has been enraged by the death of his brother!", 175, 75, byte.MaxValue);
-                    else if (Main.netMode == NetmodeID.Server)
-                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("Mutant has been enraged by the death of his brother!"), new Color(175, 75, 255), -1);
+                    Main.npc[mutant].Transform(ModContent.NPCType<MutantBoss>());
+                    FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.MutantEnrage.AbomDeath", new Color(175, 75, 255));
                 }
             }
+
             else if (npc.type == MasomodeEX.Fargo.Find<ModNPC>("Deviantt").Type)
             {
                 int mutant = NPC.FindFirstNPC(MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type);
                 if (mutant > -1 && Main.npc[mutant].active)
                 {
-                    Main.npc[mutant].Transform(MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
-                    if (Main.netMode == NetmodeID.SinglePlayer)
-                        Main.NewText("Mutant has been enraged by the death of his sister!", 175, 75, byte.MaxValue);
-                    else if (Main.netMode == NetmodeID.Server)
-                        ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("Mutant has been enraged by the death of his sister!"), new Color(175, 75, 255), -1);
+                    Main.npc[mutant].Transform(ModContent.NPCType<MutantBoss>());
+                    FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.MutantEnrage.DeviDeath", new Color(175, 75, 255));
                 }
             }
+
             else if (npc.type == MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type)
             {
                 npc.active = true;
                 npc.life = 1;
-                npc.Transform(ModContent.NPCType<MutantBoss>());
 
-                if (Main.netMode == NetmodeID.SinglePlayer)
-                    Main.NewText("Mutant has been enraged!", 175, 75, byte.MaxValue);
-                else if (Main.netMode == NetmodeID.Server)
-                    ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("Mutant has been enraged!"), new Color(175, 75, 255), -1);
-                
+                npc.Transform(ModContent.NPCType<MutantBoss>());
+                FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.MutantEnrage.Common", new Color(175, 75, 255));
                 return false;
             }
         }
@@ -1705,32 +1777,32 @@ public class MasomodeEXGlobalNPC : GlobalNPC
     public override void OnKill(NPC npc)
     {
         if (MasoModeUtils.checkIfMasoEX() && npc.type == NPCID.MoonLordCore)
-        {
-            Main.NewText("Ahhhhh! It was a mistake to cum here!", Color.LimeGreen);
-            Main.NewText("The enemy souls are possessed by ethereal spirits...", Color.LimeGreen);
-        }
+            FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.NPCYap.MoonLord.Death", Color.LimeGreen);
     }
 
-    public override void ModifyHitByItem(NPC npc, Player player, Item item, ref HitModifiers modifiers)
+    public override void ModifyHitByItem(NPC npc, Player player, Item item, ref NPC.HitModifiers modifiers)
     {
-        if (WorldSavingSystem.EternityMode && Condition.ForTheWorthyWorld.IsMet())
-            modifiers.FinalDamage.Base = ModifyHitByEither(npc, (int)modifiers.FinalDamage.Base);
+        if (!MasoModeUtils.checkIfMasoEX())
+            return;
+        
+        modifiers.FinalDamage.Base = ModifyHitByEither(npc, (int)modifiers.FinalDamage.Base);
     }
 
-    public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref HitModifiers modifiers)
+    public override void ModifyHitByProjectile(NPC npc, Projectile projectile, ref NPC.HitModifiers modifiers)
     {
-        if (!WorldSavingSystem.EternityMode || !Condition.ForTheWorthyWorld.IsMet())
+        if (!MasoModeUtils.checkIfMasoEX())
             return;
 
         modifiers.FinalDamage.Base = ModifyHitByEither(npc, (int)modifiers.FinalDamage.Base);
 
-        if (!NPC.downedBoss3 && MasoModeUtils.AnyBossAlive() && projectile.type == 27)
-            NPC.SpawnOnPlayer(projectile.owner, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+        if (!NPC.downedBoss3 && MasoModeUtils.AnyBossAlive() && projectile.type == ProjectileID.WaterBolt)
+            NPC.SpawnOnPlayer(projectile.owner, ModContent.NPCType<MutantBoss>());
 
-        if (npc.aiStyle == 37)
+        if (npc.aiStyle == NPCAIStyleID.TheDestroyer)
         {
             if (projectile.penetrate > 0)
                 modifiers.FinalDamage.Base /= projectile.penetrate;
+
             else if (projectile.penetrate < 0)
                 modifiers.FinalDamage.Base /= 5f;
         }
@@ -1810,15 +1882,16 @@ public class MasomodeEXGlobalNPC : GlobalNPC
         if (!MasoModeUtils.checkIfMasoEX() || !(npc.type == NPCID.Nurse && firstButton))
             return;
 
-        for (int i = 0; i < 200; i++)
+        for (int i = 0; i < Main.maxNPCs; i++)
         {
             if (Main.npc[i].active && Main.npc[i].boss)
             {
                 npc.StrikeInstantKill();
-                SoundEngine.PlaySound(SoundID.Roar, (Vector2?)Main.player[Main.myPlayer].Center, null);
-                Main.player[Main.myPlayer].AddBuff(Mod.Find<ModBuff>("MutantJudgement").Type, 3600, true, false);
+                SoundEngine.PlaySound(SoundID.Roar, Main.LocalPlayer.Center);
+                Main.LocalPlayer.AddBuff(ModContent.BuffType<MutantJudgement>(), 3600);
+
                 for (int j = 0; j < 10; j++)
-                    NPC.SpawnOnPlayer(Main.myPlayer, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+                    NPC.SpawnOnPlayer(Main.myPlayer, ModContent.NPCType<MutantBoss>());
                 break;
             }
         }
@@ -1829,9 +1902,10 @@ public class MasomodeEXGlobalNPC : GlobalNPC
         if (MasoModeUtils.checkIfMasoEX())
         {
             if (npc.type == MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type && Main.rand.NextBool(3))
-                chat = "What you're doing is a crime against the universe, mortal.";
+                chat = Language.GetTextValue("Mods.MasomodeEX.NPCYap.MutantChat");
+
             else if (npc.type == MasomodeEX.Fargo.Find<ModNPC>("Deviantt").Type && Main.rand.NextBool(3))
-                chat = "Play a real game mode, would you? Not this... thing.";
+                chat = "Mods.MasomodeEX.NPCYap.DeviChat";
         }
     }
 
@@ -1843,14 +1917,11 @@ public class MasomodeEXGlobalNPC : GlobalNPC
         int mutant = NPC.FindFirstNPC(MasomodeEX.Fargo.Find<ModNPC>("Mutant").Type);
         if (mutant > -1 && Main.npc[mutant].active)
         {
-            Main.npc[mutant].Transform(MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
-            if (Main.netMode == NetmodeID.SinglePlayer)
-                Main.NewText("Mutant has been enraged by the abduction of his sister!", 175, 75, byte.MaxValue);
-            else if (Main.netMode == NetmodeID.Server)
-                ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral("Mutant has been enraged by the abduction of his sister!"), new Color(175, 75, 255), -1);
+            Main.npc[mutant].Transform(ModContent.NPCType<MutantBoss>());
+            FargoSoulsUtil.PrintLocalization("Mods.MasomodeEX.MutantEnrage.DeviAbduction", new Color(175, 75, 255));
         }
         else
-            NPC.SpawnOnPlayer(player.whoAmI, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+            NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<MutantBoss>());
     }
 
     public override void EditSpawnPool(IDictionary<int, float> pool, NPCSpawnInfo spawnInfo)
@@ -1858,17 +1929,38 @@ public class MasomodeEXGlobalNPC : GlobalNPC
         if (!MasoModeUtils.checkIfMasoEX())
             return;
 
-        pool[MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type] = 0.0001f;
+        pool[ModContent.NPCType<MutantBoss>()] = 0.0001f;
         if (!NPC.downedBoss3)
         {
-            Tile tileSafely = Framing.GetTileSafely(spawnInfo.PlayerFloorX, spawnInfo.PlayerFloorY);
-            ushort tileType = tileSafely.TileType;
-            if (tileType == 41 || (uint)(tileType - 43) <= 1u)
-                pool[68] = 1000f;
-            tileSafely = Framing.GetTileSafely(spawnInfo.Player.Center);
-            tileType = tileSafely.WallType;
-            if ((uint)(tileType - 7) <= 2u || (uint)(tileType - 94) <= 5u)
-                pool[68] = 1000f;
+            switch (Framing.GetTileSafely(spawnInfo.PlayerFloorX, spawnInfo.PlayerFloorY).TileType)
+            {
+                case TileID.BlueDungeonBrick:
+                case TileID.GreenDungeonBrick:
+                case TileID.PinkDungeonBrick:
+                    pool[NPCID.DungeonGuardian] = 1000f;
+                    break;
+
+                default:
+                    break;
+            }
+
+            switch (Framing.GetTileSafely(spawnInfo.Player.Center).WallType)
+            {
+                case WallID.BlueDungeonSlabUnsafe:
+                case WallID.BlueDungeonTileUnsafe:
+                case WallID.BlueDungeonUnsafe:
+                case WallID.GreenDungeonSlabUnsafe:
+                case WallID.GreenDungeonTileUnsafe:
+                case WallID.GreenDungeonUnsafe:
+                case WallID.PinkDungeonSlabUnsafe:
+                case WallID.PinkDungeonTileUnsafe:
+                case WallID.PinkDungeonUnsafe:
+                    pool[NPCID.DungeonGuardian] = 1000f;
+                    break;
+
+                default:
+                    break;
+            }
         }
     }
 }

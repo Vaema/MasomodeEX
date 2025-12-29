@@ -7,6 +7,8 @@ using Terraria.DataStructures;
 using Terraria.GameContent;
 using Terraria.ModLoader;
 using Terraria.ID;
+using FargowiltasSouls.Content.Buffs.Masomode;
+using FargowiltasSouls.Content.Buffs.Boss;
 
 namespace MasomodeEX.Content.Projectiles
 {
@@ -46,9 +48,10 @@ namespace MasomodeEX.Content.Projectiles
                         int hitDirection = Projectile.Center.X > player.Center.X ? 1 : -1;
                         player.Hurt(PlayerDeathReason.ByProjectile(player.whoAmI, Projectile.whoAmI), Projectile.damage, hitDirection, false, false, 0, false, 0f, 0f, 4.5f);
                         player.GetModPlayer<FargoSoulsPlayer>().MaxLifeReduction += 200;
-                        player.AddBuff(Mod.Find<ModBuff>("OceanicMaul").Type, 5400, true, false);
-                        player.AddBuff(Mod.Find<ModBuff>("CurseoftheMoon").Type, 600, true, false);
-                        player.AddBuff(Mod.Find<ModBuff>("MutantFang").Type, 300, true, false);
+
+                        player.AddBuff(ModContent.BuffType<OceanicMaulBuff>(), 5400);
+                        player.AddBuff(ModContent.BuffType<CurseoftheMoonBuff>(), 600);
+                        player.AddBuff(ModContent.BuffType<MutantFangBuff>(), 300);
                     }
 
                     if (distance > 1200f && distance < 6000f)

@@ -2,6 +2,7 @@ using Microsoft.Xna.Framework;
 using Terraria;
 using Terraria.ModLoader;
 using Terraria.ID;
+using FargowiltasSouls;
 
 namespace MasomodeEX.Content.NPCs;
 
@@ -48,14 +49,8 @@ public class PhantomPortal : ModNPC
             NPC.ai[1] = 0f;
             if (!NPC.AnyNPCs(spawn) && Main.netMode != NetmodeID.MultiplayerClient)
             {
-                Main.NewText(Main.rand.Next(5) switch
-                {
-                    0 => "Guys, Will you assist me for a moment?",
-                    1 => "I'm going to bring more of my servants to assist me!",
-                    2 => "Go servants, what are you all waiting for?",
-                    3 => "Servants! Get this little peasant out of my sight at once!",
-                    _ => "Mwahahahahahahahahaha! Trap this tiny struggle at once!",
-                }, Color.LimeGreen);
+                int rand = Main.rand.Next(5);
+                FargoSoulsUtil.PrintLocalization($"Mods.MasomodeEX.NPCYap.MoonLord.PortalSummon{rand}", Color.LimeGreen);
 
                 int i = NPC.NewNPC(null, (int)NPC.Center.X, (int)NPC.Center.Y, spawn, 0, 0f, 0f, 0f, 0f, 255);
                 if (i != 200 && Main.netMode == 2)

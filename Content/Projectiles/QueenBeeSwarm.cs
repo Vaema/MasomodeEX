@@ -1,4 +1,5 @@
 using System;
+using FargowiltasSouls.Content.Projectiles.Masomode;
 using FargowiltasSouls.Core.Systems;
 using Microsoft.Xna.Framework;
 using Terraria;
@@ -20,7 +21,7 @@ namespace MasomodeEX.Content.Projectiles
             if (!WorldSavingSystem.EternityMode || !Condition.ForTheWorthyWorld.IsMet())
                 return true;
 
-            if (projectile.type == MasomodeEX.Souls.Find<ModProjectile>("Bee").Type)
+            if (projectile.type == ModContent.ProjectileType<Bee>())
             {
                 Collision.HitTiles(projectile.position, projectile.velocity, projectile.width, projectile.height);
                 SoundEngine.PlaySound(SoundID.Item10);

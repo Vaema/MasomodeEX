@@ -1,3 +1,4 @@
+using FargowiltasSouls.Content.Bosses.MutantBoss;
 using Terraria;
 using Terraria.ModLoader;
 
@@ -18,14 +19,14 @@ namespace MasomodeEX.Content.Items
             if (--Item.stack < 1)
                 Item.SetDefaults(0);
 
-            NPC.SpawnOnPlayer(player.whoAmI, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+            NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<MutantBoss>());
         }
 
         public override bool CanPickup(Player player) => true;
 
         public override bool OnPickup(Player player)
         {
-            NPC.SpawnOnPlayer(player.whoAmI, MasomodeEX.Souls.Find<ModNPC>("MutantBoss").Type);
+            NPC.SpawnOnPlayer(player.whoAmI, ModContent.NPCType<MutantBoss>());
             return false;
         }
     }

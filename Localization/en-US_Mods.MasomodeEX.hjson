@@ -26,3 +26,99 @@ Messages.JoinWorld:
 	This is unbalanced, impossibly difficult Masochist EX mode!!
 	Disable Masochist Mode EX mod for the correct Fargo's Souls Mod experience!!!
 	'''
+
+Buffs: {
+	MutantJudgement: {
+		DisplayName: Mutant Judgement
+		Description: You have been deemed unworthy
+	}
+}
+
+PlayerDeathReasons: {
+	Tree: "{0} was pricked by a Tree."
+	DemonAltar: "{0} was slain."
+	LordHitCap: "{0} got terminated."
+	EoWOneShot: "{0} was eaten alive by Eater of Worlds."
+	TheDestroyer: "{0} was eaten alive by The Destroyer."
+	NutCracker: "{0} got his nuts cracked."
+	Shatter: "{0} shattered."
+}
+
+NPCYap: {
+	MutantVeinMiner: Don't even try to bring that vein-mining cheese in here!
+	MutantChat: What you're doing is a crime against the universe, mortal.
+	DeviChat: Play a real game mode, would you? Not this... thing.
+
+	MoonLord: {
+		OneShotProtection: YOU THINK YOU CAN BUTCHER A GREAT LORD!?!
+		Death:
+			'''
+			Ahhhhh! It was a mistake to cum here!
+			The enemy souls are possessed by ethereal spirits...
+			'''
+		Spawn0: Your fate has been sealed...
+		Spawn1: A godly fate approaches your essence...
+		Spawn2: Well well well, You spawned me! How could you!?!
+		Spawn3: If you keep doing this to me, You have Cthulhu to contend with!
+		Rematch0: Guess who's back, that's right it's me! Mwahahahahahaha!
+		Rematch1: Ugh, not again!
+
+		FightProgress: {
+			Full0: Aaahhh, What are you even doing to me?
+			Full1: Not my heart!
+			MoreHalf: Why are you ever attacking me ignorantly?
+			Half: Grrrrrr! What are you doing to me you little peasant!?!
+			Quarter: Owwwww!! HELP ME!! I'm getting badly hurt by this little struggle!!
+			15: NOOOOOO! Stop trying to defeat me you silly little peasant!!!
+			1: THAT'S IT!!! I'LL JUST REGENERATE MORE HEALTH EVERY SECOND!!!!!!
+
+			0: {
+				5: GGRRRRR!!!! ARE YOU DONE ATTACKING ME YET!?!?!
+				1: SURRENDER NOW!
+				05: THIS IS MY LAST ATTACK -- MY TRUMP CARD AS LIBTARDS WOULD SAY. SURRENDER NOW OR FACE MY GAMER DAB!
+				01: This isnt over!
+			}
+		}
+
+		PlayerState: {
+			Half0: The Grand Hero will fall, Hahahahahaha!!!"
+			Half1: Do you know how I obtained my power? Oh, you don't know the strength I hold? Well here you go!!
+			Quarter: THE OCTOPUS GOD RULES THE DEPTHS, THE TWINS RULE THE SKIES. BUT I, THE GREAT EARTH LORD, RULE THE EARTH ITSELF!!!
+			Death: Weakling!!
+			FreeEyeDeath: You can�t even survive them! What hope do you have against me!?
+		}
+
+		Leech: WHAT ARE YOU DOING TO ME!?! Healing Leech Clots, Recover me at once!
+		Revive: Hehehehehehe! I GUARANTEE YOU DON'T HAVE ENOUGH POWER TO DEFEAT ME!!!
+		EyesFree: Ahhhh, my eyes!
+		PortalSummon0: Guys, Will you assist me for a moment?
+		PortalSummon1: I'm going to bring more of my servants to assist me!
+		PortalSummon2: Go servants, what are you all waiting for?
+		PortalSummon3: Servants! Get this little peasant out of my sight at once!
+		PortalSummon4: Mwahahahahahahahahaha! Trap this tiny struggle at once!
+		Invincible0: It looks like you can't defeat me!
+		Invincible1: I see that you have annihilated my son! You, wimp!
+		Invincible2: I still have plenty of gimmicks and tricks left!
+		Invisible: so solid.
+	}
+}
+
+MutantEnrage: {
+	Common: Mutant has been enraged!
+	AbomDeath: Mutant has been enraged by the death of his brother!
+	DeviDeath: Mutant has been enraged by the death of his sister!
+	DeviAbduction: Mutant has been enraged by the abduction of his sister!
+}
+
+Configs: {
+	MasoEXClientConfig: {
+		DisplayName: Client Config
+
+		GreetingMessage: {
+			Label: "[i:890] Greeting Message"
+			Tooltip: Whether or not greeting message should appear on enter the world
+		}
+
+		Headers.Misc: World
+	}
+}

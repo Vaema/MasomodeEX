@@ -1,10 +1,9 @@
 using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Chat;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ID;
 using MasomodeEX.Common.Globals;
+using FargowiltasSouls;
 
 namespace MasomodeEX.Content.Projectiles;
 
@@ -31,63 +30,14 @@ public class MoonLordText : ModProjectile
         }
 
         NPC npc = Main.npc[ai0];
-        Player player = Main.player[npc.target];
         Projectile.Center = npc.Center;
         Projectile.timeLeft = 2;
-        
-        if (!text[0])
-        {
-            text[0] = true;
-            
-            EdgyBossText(npc, "Your fate has been sealed...");
-            EdgyBossText(npc, "A godly fate approaches your essence...");
-            EdgyBossText(npc, "Well well well, You spawned me! How could you!?!");
-            EdgyBossText(npc, "If you keep doing this to me, You have Cthulhu to contend with!");
-            
-            if (NPC.downedMoonlord)
-            {
-                EdgyBossText(npc, "Guess who's back, that's right it's me! Mwahahahahahaha!");
-                EdgyBossText(npc, "Ugh, not again!");
-            }
-        }
 
-        EdgyBossText(npc, ref text[1], 1.0, "Aaahhh, What are you even doing to me?");
-        EdgyBossText(npc, ref text[2], 1.0, "Not my heart!");
-        EdgyBossText(npc, ref text[3], 0.75, "Why are you ever attacking me ignorantly?");
-        EdgyBossText(npc, ref text[4], 0.5, "Grrrrrr! What are you doing to me you little peasant!?!");
-        EdgyBossText(npc, ref text[5], 0.25, "Owwwww!! HELP ME!! I'm getting badly hurt by this little struggle!!");
-        EdgyBossText(npc, ref text[6], 0.15, "NOOOOOO! Stop trying to defeat me you silly little peasant!!!");
-        EdgyBossText(npc, ref text[7], 0.1, "THAT'S IT!!! I'LL JUST REGENERATE MORE HEALTH EVERY SECOND!!!!!!");
-        EdgyBossText(npc, ref text[8], 0.05, "GGRRRRR!!!! ARE YOU DONE ATTACKING ME YET!?!?!");
-        EdgyBossText(npc, ref text[9], 0.01, "SURRENDER NOW!");
-        EdgyBossText(npc, ref text[10], 0.005, "THIS IS MY LAST ATTACK -- MY TRUMP CARD AS LIBTARDS WOULD SAY. SURRENDER NOW OR FACE MY GAMER DAB!");
-        EdgyBossText(npc, ref text[11], 0.01, "This isn’t over!");
-        
-        if (!text[12] && player.statLife < player.statLifeMax2 * 0.5)
-        {
-            text[12] = true;
-            EdgyBossText(npc, "The Grand Hero will fall, Hahahahahaha!!!");
-        }
-        
-        if (!text[13] && player.statLife < 200)
-        {
-            text[13] = true;
-            EdgyBossText(npc, "Do you know how I obtained my power? Oh, you don't know the strength I hold? Well here you go!!");
-        }
-        
-        if (!text[14] && player.statLife < player.statLifeMax2 * 0.25)
-        {
-            text[14] = true;
-            EdgyBossText(npc, "THE OCTOPUS GOD RULES THE DEPTHS, THE TWINS RULE THE SKIES. BUT I, THE GREAT EARTH LORD, RULE THE EARTH ITSELF!!!");
-        }
-        
-        if (!text[15] && (!player.active || player.dead))
-        {
-            text[15] = true;
-            EdgyBossText(npc, "Weakling!!");
-            if (NPC.AnyNPCs(400))
-                EdgyBossText(npc, "You can’t even survive them! What hope do you have against me!?");
-        }
+        SpawnTalk();
+
+        FightProgressTalk(npc);
+
+        TargetStateTalk(npc);
 
         if (!text[16] && npc.GetGlobalNPC<MasomodeEXGlobalNPC>().masoBool[1])
         {
@@ -98,20 +48,122 @@ public class MoonLordText : ModProjectile
         }
     }
 
-    private void EdgyBossText(NPC npc, ref bool check, double threshold, string text)
+    private void SpawnTalk()
     {
-        if (!check && npc.life < npc.lifeMax * threshold)
+        if (!text[0])
         {
-            check = true;
-            EdgyBossText(npc, text);
+            if (!NPC.downedMoonlord)
+            {
+                Talk(ref text[0], "Spawn", 4);
+            }
+            else
+            {
+                Talk(ref text[0], "Rematch", 2);
+            }
         }
     }
 
-    private void EdgyBossText(NPC npc, string text)
+    private void FightProgressTalk(NPC npc)
     {
-        if (Main.netMode == NetmodeID.SinglePlayer)
-            Main.NewText(text, (Color?)Color.LimeGreen);
-        else if (Main.netMode == NetmodeID.Server)
-            ChatHelper.BroadcastChatMessage(NetworkText.FromLiteral(text), Color.LimeGreen, -1);
+        if (!npc.HasValidTarget)
+            return;
+
+        switch (npc.GetLifePercent())
+        {
+            case < 0.001f:
+                Talk(ref text[11], "FightProgress.0.01");
+                break;
+
+            case < 0.005f:
+                Talk(ref text[10], "FightProgress.0.05");
+                break;
+
+            case < 0.01f:
+                Talk(ref text[9], "FightProgress.0.1");
+                break;
+
+            case < 0.05f:
+                Talk(ref text[8], "FightProgress.0.5");
+                break;
+
+            case < 0.1f:
+                Talk(ref text[7], "FightProgress.1");
+                break;
+
+            case < 0.15f:
+                Talk(ref text[6], "FightProgress.15");
+                break;
+
+            case < 0.25f:
+                Talk(ref text[5], "FightProgress.Quarter");
+                break;
+
+            case < 0.5f:
+                Talk(ref text[4], "FightProgress.Half");
+                break;
+
+            case < 0.75f:
+                Talk(ref text[3], "FightProgress.MoreHalf");
+                break;
+
+            case < 1: // idk, this mfs talks these lines at same time
+                Talk(ref text[1], "FightProgress.Full0");
+                Talk(ref text[2], "FightProgress.Full1");
+                break;
+        }
+    }
+
+    private void TargetStateTalk(NPC npc)
+    {
+        if (!npc.HasValidTarget)
+            return;
+
+        var target = Main.player[npc.target];
+        float perc = target.statLifeMax2 / target.statLife;
+
+        switch (perc)
+        {
+            case < 0.25f:
+                Talk(ref text[14], "PlayerState.Quarter");
+                break;
+
+            case < 0.5f:
+                Talk(ref text[12], "PlayerState.Half0");
+                break;
+        }
+
+        if (!text[13])
+        {
+            if (target.statLife < 200)
+            {
+                Talk(ref text[13], "PlayerState.Half1");
+            }
+        }
+
+        if (!target.Alive() && !text[15])
+        {
+            bool eyes = NPC.AnyNPCs(NPCID.MoonLordFreeEye);
+            Talk(ref text[15], "PlayerState.Death", talkSwitch: !eyes);
+
+            if (eyes)
+            {
+                Talk(ref text[15], "PlayerState.FreeEyeDeath");
+            }
+        }
+    }
+
+    private void Talk(ref bool talked, string textKey, int randMax = -1, Color? color = null, bool talkSwitch = true)
+    {
+        if (!talked)
+        {
+            if (talkSwitch)
+                talked = true;
+
+            string random = randMax == -1 ? "" : $"{Main.rand.Next(randMax)}";
+            string keyClear = "Mods.MasomodeEX.NPCYap.MoonLord." + textKey + random;
+            color ??= Color.LimeGreen;
+
+            FargoSoulsUtil.PrintLocalization(keyClear, (Color)color);
+        }
     }
 }

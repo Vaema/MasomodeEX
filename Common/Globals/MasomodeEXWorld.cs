@@ -1,9 +1,7 @@
 using System.Collections.Generic;
 using System.IO;
 using FargowiltasSouls.Core.Systems;
-using Microsoft.Xna.Framework;
 using Terraria;
-using Terraria.Localization;
 using Terraria.ModLoader;
 using Terraria.ModLoader.IO;
 using Terraria.ID;
